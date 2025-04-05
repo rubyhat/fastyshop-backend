@@ -10,6 +10,10 @@
 # Ignore all environment files.
 /.env*
 
+# Allow the example env file to be committed
+!.env.example
+
+
 # Ignore all logfiles and tempfiles.
 /log/*
 /tmp/*
@@ -29,4 +33,9 @@
 !/tmp/storage/.keep
 
 # Ignore master key for decrypting credentials and more.
-/config/master.key
+/config/master.
+
+# RubyMine / IntelliJ IDEA
+.idea/
+*.iml
+

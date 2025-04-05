@@ -45,3 +45,18 @@ group :development, :test do
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 end
+
+gem "jwt", "~> 2.10"
+gem "dotenv-rails", "~> 3.1"
+gem "pundit", "~> 2.5"
+gem "annotate", "~> 2.6"
+gem "discard", "~> 1.4"
+gem "uuidtools", "~> 3.0"
+gem "active_model_serializers", "~> 0.10.15"
+gem "ransack", "~> 4.3"
+gem "pagy", "~> 9.3"
+gem "aws-sdk-s3", "~> 1.183"
+gem "image_processing", "~> 1.14"
+gem "sidekiq", "~> 8.0"
+gem "rspec-rails", "~> 7.1"
+gem "factory_bot_rails", "~> 6.4"

@@ -1,0 +1,5 @@
+services:
+  web:
+    environment:
+      RAILS_ENV: production
+    ports: [] # Оставим пусто — будем проксировать через nginx или load balancer

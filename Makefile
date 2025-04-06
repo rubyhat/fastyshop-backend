@@ -24,6 +24,10 @@ clean-dev:
 logs-dev:
 	docker compose --env-file $(ENV_FILE_DEV) logs -ft
 
+## 🔧 Установка гемов через bundle install внутри контейнера
+bundle-install:
+	docker compose --env-file $(ENV_FILE_DEV) exec web bundle install
+
 ## 🔧 Создание БД, миграции и сиды (db:prepare)
 db-prepare:
 	docker compose --env-file $(ENV_FILE_DEV) exec web bin/rails db:prepare

@@ -22,25 +22,25 @@ default: &default
 
 development:
   <<: *default
-  database: kagi_backend_development
+  database: <%= ENV.fetch("POSTGRES_DB", "kagi_backend_development") %>
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.
   # When left blank, PostgreSQL will use the default role. This is
   # the same name as the operating system user running Rails.
-  username: marshall
+  username: <%= ENV.fetch("POSTGRES_USER", "postgres") %>
 
   # The password associated with the PostgreSQL role (username).
-  password: marshall
+  password: <%= ENV.fetch("POSTGRES_PASSWORD", "postgres") %>
 
   # Connect on a TCP socket. Omitted by default since the client uses a
   # domain socket that doesn't need configuration. Windows does not have
   # domain sockets, so uncomment these lines.
-  #host: localhost
+  host: <%= ENV.fetch("POSTGRES_HOST", "db") %>
 
   # The TCP port the server listens on. Defaults to 5432.
   # If your server runs on a different port number, change accordingly.
-  #port: 5432
+  port: 5432
 
   # Schema search path. The server defaults to $user,public
   #schema_search_path: myapp,sharedapp,public
@@ -56,7 +56,11 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: kagi_backend_test
+  database: <%= ENV.fetch("POSTGRES_DB", "kagi_backend_test") %>
+  username: <%= ENV.fetch("POSTGRES_USER", "postgres") %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD", "postgres") %>
+  host: <%= ENV.fetch("POSTGRES_HOST", "db") %>
+  port: 5432
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is

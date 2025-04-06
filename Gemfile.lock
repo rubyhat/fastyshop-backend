@@ -285,6 +285,8 @@ GEM
       i18n
     rdoc (6.13.1)
       psych (>= 4.0.0)
+    redis (5.4.0)
+      redis-client (>= 0.22.0)
     redis-client (0.24.0)
       connection_pool
     regexp_parser (2.10.0)
@@ -421,6 +423,7 @@ DEPENDENCIES
   pundit (~> 2.5)
   rails (~> 8.0.2)
   ransack (~> 4.3)
+  redis (~> 5.4)
   rspec-rails (~> 7.1)
   rubocop-rails-omakase
   sidekiq (~> 8.0)

@@ -52,6 +52,15 @@ db-status:
 console:
 	docker compose --env-file $(ENV_FILE_DEV) exec web bin/rails console
 
+## 🎮 Генерация API-контроллера (например: make controller NAME=api/v1/users)
+controller:
+	@if [ -z "$(NAME)" ]; then \
+	  echo "❌ Пожалуйста, укажи NAME (например, NAME=api/v1/users)"; \
+	else \
+	  docker compose --env-file $(ENV_FILE_DEV) exec web bin/rails generate controller $(NAME) --skip-template-engine --no-assets --api; \
+	fi
+
+
 
 # ========================
 # 🚀 PRODUCTION

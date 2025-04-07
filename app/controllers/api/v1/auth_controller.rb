@@ -2,7 +2,9 @@
 
 module Api
   module V1
-    class AuthController < ApplicationController
+    class AuthController < BaseController
+      skip_before_action :authenticate_user!, only: [ :login, :refresh ]
+
       # POST /auth/login
       #
       # Аутентифицирует пользователя по номеру телефона и паролю,
@@ -22,7 +24,12 @@ module Api
             refresh_token: tokens[:refresh_token]
           }, status: :ok
         else
-          render json: { error: "Неверный логин или пароль" }, status: :unauthorized
+          render_error(
+            key: "auth.invalid_credentials",
+            message: "Invalid phone or password",
+            status: :unauthorized,
+            code: 401
+          )
         end
       end
 
@@ -44,10 +51,15 @@ module Api
               refresh_token: tokens[:refresh_token]
             }, status: :ok
           else
-            render json: { error: "Неверный или просроченный refresh токен" }, status: :unauthorized
+            render_error(
+              key: "auth.invalid_refresh_token",
+              message: "Refresh token is invalid or expired",
+              status: :unauthorized,
+              code: 401
+            )
           end
         else
-          render json: { error: "Невалидный токен" }, status: :unauthorized
+          render_invalid_token
         end
       end
 

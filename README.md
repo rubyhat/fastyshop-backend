@@ -237,3 +237,9 @@ psql -h localhost -U postgres -p 5432 -l
 ```
 nc -zv localhost 5432
 ```
+
+Проверка к чему есть доступ в классе:
+```
+make console
+Api::V1::AuthController.ancestors
+```

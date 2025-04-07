@@ -16,8 +16,8 @@ Country.find_or_create_by!(code: "KZ") do |country|
 end
 
 puts "👑 Создаём супер-админа..."
-User.find_or_create_by!(phone: "+77001112233") do |user|
-  user.email = "admin@kagi.local"
+User.find_or_create_by!(phone: "77001112233") do |user|
+  user.email = "admin2@kagi.local"
   user.password = "supersecure"
   user.password_confirmation = "supersecure"
   user.role = :superadmin

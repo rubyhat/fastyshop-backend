@@ -11,7 +11,7 @@ class TokenStorageRedis
     # @param user_id [String]
     # @param iat [Integer] метка времени создания токена
     def save(user_id:, iat:)
-      redis.setex(redis_key(user_id), refresh_ttl, iat.to_s)
+      redis.setex(redis_key(user_id), JwtConfig.refresh_token_ttl, iat.to_s)
     end
 
     # Проверяет, совпадает ли переданный iat с сохранённым в Redis
@@ -39,10 +39,6 @@ class TokenStorageRedis
 
     def redis
       @redis ||= Redis.new(url: ENV.fetch("REDIS_URL", "redis://localhost:6379"))
-    end
-
-    def refresh_ttl
-      Rails.application.config.jwt[:refresh_token_lifetime]
     end
   end
 end

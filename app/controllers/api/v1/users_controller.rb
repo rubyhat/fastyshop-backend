@@ -8,13 +8,9 @@ module Api
       # Возвращает текущего авторизованного пользователя.
       # Использует current_user, установленный в BaseController.
       def me
-        user = current_user
+        authorize current_user, :me?
 
-        if user
-          render json: current_user, status: :ok
-        else
-          render_unauthorized
-        end
+        render json: current_user, status: :ok
       end
     end
   end

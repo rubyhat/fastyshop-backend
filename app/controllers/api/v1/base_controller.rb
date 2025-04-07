@@ -4,6 +4,10 @@ module Api
   module V1
     class BaseController < ApplicationController
       include ApiErrorHandling
+      include Pundit
+
+      rescue_from Pundit::NotAuthorizedError, with: :render_forbidden
+
 
       before_action :authenticate_user!
 

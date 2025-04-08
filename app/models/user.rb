@@ -15,9 +15,17 @@
 #   @return [String] код страны пользователя (например, "KZ")
 # @!attribute [rw] is_active
 #   @return [Boolean] флаг активности пользователя
+#
+# @!method seller_profile
+#   @return [SellerProfile, nil]
+#
+# @!method build_seller_profile(attributes = {})
+#   @param attributes [Hash]
+#   @return [SellerProfile]
 
 class User < ApplicationRecord
   has_secure_password
+  has_one :seller_profile, dependent: :destroy
 
   enum :role, {
     superadmin: 0,

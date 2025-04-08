@@ -21,6 +21,9 @@ class UserPolicy < ApplicationPolicy
     end
   end
 
+  def manage_seller_profile?
+    user.superadmin? || user.supermanager? || user.id == record.user_id
+  end
 
   def show?
     true

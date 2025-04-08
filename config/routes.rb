@@ -17,6 +17,10 @@ Rails.application.routes.draw do
       get :me, to: "users#me"
 
       resources :users, only: %i[create update show destroy index]
+      resources :seller_profiles, only: %i[create update show index]
+
+      # Просмотр seller_profile по user_id
+      get "users/:user_id/seller_profile", to: "seller_profiles#show_by_user"
     end
   end
 end

@@ -43,7 +43,11 @@ class ApplicationPolicy
     end
 
     def resolve
-      raise NoMethodError, "You must define #resolve in #{self.class}"
+      if user.superadmin? || user.supermanager?
+        scope.all
+      else
+        scope.where(id: user.id)
+      end
     end
 
     private

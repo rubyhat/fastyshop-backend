@@ -8,21 +8,62 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
+# frozen_string_literal: true
 
 puts "🌍 Добавляем страны..."
-Country.find_or_create_by!(code: "KZ") do |country|
-  country.name = "Казахстан"
-  country.phone_prefix = "+7"
+
+[
+  { code: "KZ", name: "Казахстан", phone_prefix: "+7" },
+  { code: "RU", name: "Россия", phone_prefix: "+7" }
+].each do |country_attrs|
+  Country.find_or_create_by!(code: country_attrs[:code]) do |country|
+    country.name = country_attrs[:name]
+    country.phone_prefix = country_attrs[:phone_prefix]
+  end
 end
 
-puts "👑 Создаём супер-админа..."
-User.find_or_create_by!(phone: "77001112233") do |user|
-  user.email = "admin2@kagi.local"
-  user.password = "supersecure"
-  user.password_confirmation = "supersecure"
-  user.role = :superadmin
-  user.country_code = "KZ"
-  user.is_active = true
+puts "👑 Создаём пользователей по ролям..."
+
+users = [
+  {
+    phone: "77000000001",
+    email: "superadmin@kagi.local",
+    password: "Superadmin1@",
+    role: :superadmin,
+    country_code: "KZ"
+  },
+  {
+    phone: "77000000002",
+    email: "supermanager@kagi.local",
+    password: "Supermanager1@",
+    role: :supermanager,
+    country_code: "KZ"
+  },
+  {
+    phone: "77000000003",
+    email: "seller@kagi.local",
+    password: "Selleruser1@",
+    role: :seller,
+    country_code: "RU"
+  },
+  {
+    phone: "77000000004",
+    email: "user@kagi.local",
+    password: "Regularuser1@",
+    role: :user,
+    country_code: "RU"
+  }
+]
+
+users.each do |attrs|
+  User.find_or_create_by!(phone: attrs[:phone]) do |user|
+    user.email = attrs[:email]
+    user.password = attrs[:password]
+    user.password_confirmation = attrs[:password]
+    user.role = attrs[:role]
+    user.country_code = attrs[:country_code]
+    user.is_active = true
+  end
 end
 
 puts "✅ Все тестовые данные успешно посеяны!"

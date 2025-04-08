@@ -50,6 +50,17 @@ module ApiErrorHandling
     render_error(key: key, message: message, status: :forbidden, code: 403)
   end
 
+  def render_user_deleted
+    render json: {
+      error: {
+        key: "user.deleted",
+        message: "Пользователь удалил свой аккаунт",
+        code: 410,
+        status: "gone"
+      }
+    }, status: :gone
+  end
+
   def render_error(key:, message:, status:, code:)
     render json: {
       error: {
@@ -59,5 +70,29 @@ module ApiErrorHandling
         status: status
       }
     }, status: status
+  end
+
+  def render_success(key:, message:, code: 200)
+    render json: {
+      success: {
+        key: key,
+        message: message,
+        code: code,
+        status: :ok
+      }
+    }, status: :ok
+  end
+
+
+  def render_validation_errors(resource)
+    render json: {
+      error: {
+        key: "validation.failed",
+        message: "Ошибка валидации",
+        code: 422,
+        status: :unprocessable_entity,
+        details: resource.errors.to_hash(true)
+      }
+    }, status: :unprocessable_entity
   end
 end

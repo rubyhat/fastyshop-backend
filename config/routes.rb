@@ -15,6 +15,8 @@ Rails.application.routes.draw do
       post "auth/logout",  to: "auth#logout"
 
       get :me, to: "users#me"
+
+      resources :users, only: %i[create update show destroy index]
     end
   end
 end

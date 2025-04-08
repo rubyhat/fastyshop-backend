@@ -28,11 +28,34 @@ class User < ApplicationRecord
 
   validates :phone, presence: true, uniqueness: true
   validates :email, presence: true, uniqueness: true
-  validates :password_digest, presence: true
   validates :country_code, presence: true
+  validates :password_digest, presence: true
+  validate :validate_password_complexity, if: -> { password.present? } # Валидация сложности пароля
 
   # @return [Boolean]
   def admin?
     superadmin? || supermanager?
+  end
+
+  def validate_password_complexity
+    unless password.length >= 12
+      errors.add(:password, "должен содержать минимум 12 символов")
+    end
+
+    unless password.match?(/[A-Z]/)
+      errors.add(:password, "должен содержать хотя бы одну заглавную букву A-Z")
+    end
+
+    unless password.match?(/[a-z]/)
+      errors.add(:password, "должен содержать хотя бы одну строчную букву a-z")
+    end
+
+    unless password.match?(/\d/)
+      errors.add(:password, "должен содержать хотя бы одну цифру")
+    end
+
+    unless password.match?(/^.*(?=.*[!*@#$%^&+=_-]).*$/)
+      errors.add(:password, "должен содержать хотя бы один специальный символ")
+    end
   end
 end

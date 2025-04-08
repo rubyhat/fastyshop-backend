@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_08_175943) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_08_211012) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -21,6 +21,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_175943) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["code"], name: "index_countries_on_code", unique: true
+  end
+
+  create_table "legal_profiles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "seller_profile_id", null: false
+    t.string "company_name", null: false
+    t.string "tax_id", null: false
+    t.string "country_code", null: false
+    t.string "legal_address", null: false
+    t.string "legal_form", null: false
+    t.boolean "is_verified", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["seller_profile_id"], name: "index_legal_profiles_on_seller_profile_id"
+    t.index ["tax_id"], name: "index_legal_profiles_on_tax_id", unique: true
   end
 
   create_table "seller_profiles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

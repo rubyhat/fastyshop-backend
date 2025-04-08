@@ -36,13 +36,25 @@ db-prepare:
 db-migrate:
 	docker compose --env-file $(ENV_FILE_DEV) exec web bin/rails db:migrate
 
+## ⬆️ Выполнить конкретную миграцию по VERSION
+db-up:
+	docker compose --env-file $(ENV_FILE_DEV) exec web bin/rails db:migrate:up VERSION=$(VERSION)
+
 ## 🧪 Откат последней миграции (db:rollback)
 db-rollback:
 	docker compose --env-file $(ENV_FILE_DEV) exec web bin/rails db:rollback
 
+## ⬇️ Откатить конкретную миграцию по VERSION
+db-down:
+	docker compose --env-file $(ENV_FILE_DEV) exec web bin/rails db:migrate:down VERSION=$(VERSION)
+
 ## 🌱 Заполнить тестовыми данными из seeds.rb (db:seed)
 db-seed:
 	docker compose --env-file $(ENV_FILE_DEV) exec web bin/rails db:seed
+
+## 💣 Полный сброс базы данных и повторный запуск миграций + seed
+db-reset:
+	docker compose --env-file $(ENV_FILE_DEV) exec web bin/rails db:reset
 
 ## 🧬 Проверить статус миграций (db:migrate:status)
 db-status:

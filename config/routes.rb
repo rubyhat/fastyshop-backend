@@ -18,9 +18,10 @@ Rails.application.routes.draw do
 
       resources :users, only: %i[create update show destroy index]
       resources :seller_profiles, only: %i[create update show index]
+      get "users/:user_id/seller_profile", to: "seller_profiles#show_by_user" # Просмотр seller_profile по user_id
 
-      # Просмотр seller_profile по user_id
-      get "users/:user_id/seller_profile", to: "seller_profiles#show_by_user"
+      resources :legal_profiles, only: %i[index show create update]
+      patch "legal_profiles/:id/unverify", to: "legal_profiles#unverify" # Сброс верификации пользователем
     end
   end
 end

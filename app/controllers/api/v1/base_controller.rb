@@ -6,12 +6,17 @@ module Api
       include ApiErrorHandling
       include Pundit
 
-      rescue_from Pundit::NotAuthorizedError, with: :render_forbidden
+      rescue_from Pundit::NotAuthorizedError, with: :render_forbidden_custom
 
 
       before_action :authenticate_user!
 
       private
+
+      def render_forbidden_custom
+        render_forbidden(message: "Доступ запрещен.", key: "base.forbidden")
+      end
+
 
       # Аутентификация пользователя по access-токену
       def authenticate_user!

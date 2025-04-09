@@ -13,21 +13,6 @@ class SellerProfile < ApplicationRecord
   validates :description, length: { maximum: 1000 }, allow_blank: true
   validates :logo_url, length: { maximum: 255 }, allow_blank: true
 
-  validate :legal_profile_limit, on: :create
-
-  # todo: хардкод лимита, изменить когда будут тарифы
-  def max_legal_profiles_reached?
-    legal_profiles.count >= 2
-  end
-
-  private
-
-  def legal_profile_limit
-    if seller_profile&.max_legal_profiles_reached?
-      errors.add(:base, "Достигнуто максимальное количество юридических профилей")
-    end
-  end
-
   def generate_slug
     return if slug.present? && slug_changed? # не перезаписывать вручную заданный
 

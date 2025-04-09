@@ -16,9 +16,47 @@ module ApiErrorHandling
     rescue_from JWT::DecodeError, with: :render_invalid_token
     rescue_from JWT::ExpiredSignature, with: :render_expired_token
     rescue_from Pundit::NotAuthorizedError, with: :render_forbidden if defined?(Pundit)
+    rescue_from ActiveRecord::RecordNotUnique, with: :render_record_not_unique
   end
 
   private
+
+  def render_record_not_unique(exception = nil)
+    constraint = extract_constraint_from_exception(exception)
+    message = friendly_message_for_constraint(constraint)
+
+    render_error(
+      key: "validation.#{constraint}",
+      message: message || "Дубликат значения нарушает уникальность",
+      status: :unprocessable_entity,
+      code: 422
+    )
+  end
+
+
+  # Парсим constraint из текста PG ошибки
+  def extract_constraint_from_exception(exception)
+    return nil unless exception&.message
+
+    match = exception.message.match(/unique constraint \"(?<name>[^\"]+)\"/)
+    match[:name] if match
+  end
+
+  # Возвращаем пользовательское сообщение по имени constraint'а
+  def friendly_message_for_constraint(constraint)
+    case constraint
+    when "index_legal_profiles_on_tax_id"
+      "Такой налоговый номер уже используется"
+    when "index_users_on_email"
+      "Этот email уже зарегистрирован"
+    when "index_users_on_phone"
+      "Этот номер телефона уже используется"
+    else
+      nil
+    end
+  end
+
+
 
   def render_unauthorized(message = "Unauthorized", key = "auth.unauthorized")
     render_error(key: key, message: message, status: :unauthorized, code: 401)

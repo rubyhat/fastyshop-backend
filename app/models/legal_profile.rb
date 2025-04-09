@@ -6,4 +6,6 @@ class LegalProfile < ApplicationRecord
   validates :country_code, length: { is: 2 }
   validates :legal_form, presence: true, length: { maximum: 100 }
   validates :legal_address, length: { maximum: 500 }
+
+  validates_with LegalProfileValidator
 end

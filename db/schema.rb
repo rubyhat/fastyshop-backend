@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_08_211012) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_09_194333) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -47,6 +47,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_211012) do
     t.datetime "updated_at", null: false
     t.index ["slug"], name: "index_seller_profiles_on_slug", unique: true
     t.index ["user_id"], name: "index_seller_profiles_on_user_id", unique: true
+  end
+
+  create_table "shop_categories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "title", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.string "icon"
+    t.integer "position"
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["is_active"], name: "index_shop_categories_on_is_active"
+    t.index ["name"], name: "index_shop_categories_on_name", unique: true
+    t.index ["position"], name: "index_shop_categories_on_position"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

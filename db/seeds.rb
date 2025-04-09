@@ -66,4 +66,42 @@ users.each do |attrs|
   end
 end
 
+puts "🏬 Создаём категории магазинов..."
+shop_categories = [
+  {
+    title: "Цветы",
+    name: "flowers",
+    description: "Свежие цветы",
+    icon: "https://picsum.photos/id/106/64/64",
+    position: 1,
+    is_active: true
+  },
+  {
+    title: "Электроника",
+    name: "electronics",
+    description: "Цифровая техника",
+    icon: "https://picsum.photos/id/250/64/64",
+    position: 2,
+    is_active: true
+  },
+  {
+    title: "Кофейня",
+    name: "coffee-shop",
+    description: "Свежий молотый кофе",
+    icon: "https://picsum.photos/id/425/64/64",
+    position: 3,
+    is_active: true
+  }
+]
+
+shop_categories.each do |attrs|
+  ShopCategory.find_or_create_by!(name: attrs[:name]) do |category|
+    category.title = attrs[:title]
+    category.description = attrs[:description]
+    category.icon = attrs[:icon]
+    category.position = attrs[:position]
+    category.is_active = attrs[:is_active]
+  end
+end
+
 puts "✅ Все тестовые данные успешно посеяны!"

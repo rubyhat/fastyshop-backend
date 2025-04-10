@@ -5,6 +5,7 @@
 class SellerProfile < ApplicationRecord
   belongs_to :user
   has_many :legal_profiles, dependent: :destroy
+  has_many :shops, dependent: :restrict_with_error
 
   before_validation :generate_slug, on: :create
 

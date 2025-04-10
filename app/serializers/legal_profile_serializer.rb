@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LegalProfileSerializer < ActiveModel::Serializer
   attributes :id,
              :company_name,

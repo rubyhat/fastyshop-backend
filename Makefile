@@ -72,6 +72,10 @@ controller:
 	  docker compose --env-file $(ENV_FILE_DEV) exec web bin/rails generate controller $(NAME) --skip-template-engine --no-assets --api; \
 	fi
 
+## Просмотр всех существующих роутов
+routes:
+	docker compose --env-file $(ENV_FILE_DEV) exec web bin/rails routes
+
 
 
 # ========================

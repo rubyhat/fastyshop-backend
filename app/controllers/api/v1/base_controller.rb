@@ -4,7 +4,7 @@ module Api
   module V1
     class BaseController < ApplicationController
       include ApiErrorHandling
-      include Pundit
+      include Pundit::Authorization
 
       rescue_from Pundit::NotAuthorizedError, with: :render_forbidden_custom
 

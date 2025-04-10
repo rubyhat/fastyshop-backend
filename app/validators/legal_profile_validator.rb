@@ -13,7 +13,7 @@ class LegalProfileValidator < ActiveModel::Validator
 
   def validate_legal_profile_limit(record)
     if record.seller_profile&.legal_profiles&.count.to_i >= MAX_PROFILES
-      record.errors.add(:base, "Достигнуто максимальное количество юридических профилей по вашему тарифу")
+      record.errors.add(:base, "Достигнуто максимальное количество юридических профилей по Вашему тарифу")
     end
   end
 

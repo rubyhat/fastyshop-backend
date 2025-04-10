@@ -1,6 +1,6 @@
 class LegalProfilePolicy < ApplicationPolicy
   def index?
-    !user.superadmin? || user.supermanager? || owns_seller_profile?
+    user.superadmin? || user.supermanager? || owns_seller_profile?
   end
 
   def show?

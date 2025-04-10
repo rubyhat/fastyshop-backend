@@ -1,4 +1,4 @@
-# app/policies/seller_profile_policy.rb
+
 class SellerProfilePolicy < ApplicationPolicy
   def index?
     user.superadmin? || user.supermanager?

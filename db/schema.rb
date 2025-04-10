@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_09_194333) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_09_202728) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -61,6 +61,27 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_09_194333) do
     t.index ["is_active"], name: "index_shop_categories_on_is_active"
     t.index ["name"], name: "index_shop_categories_on_name", unique: true
     t.index ["position"], name: "index_shop_categories_on_position"
+  end
+
+  create_table "shops", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "title", null: false
+    t.string "slug", null: false
+    t.string "contact_phone", null: false
+    t.string "contact_email"
+    t.string "physical_address"
+    t.boolean "is_active", default: true, null: false
+    t.integer "shop_type", null: false
+    t.uuid "seller_profile_id", null: false
+    t.uuid "legal_profile_id", null: false
+    t.uuid "shop_category_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["is_active"], name: "index_shops_on_is_active"
+    t.index ["legal_profile_id"], name: "index_shops_on_legal_profile_id"
+    t.index ["seller_profile_id"], name: "index_shops_on_seller_profile_id"
+    t.index ["shop_category_id"], name: "index_shops_on_shop_category_id"
+    t.index ["shop_type"], name: "index_shops_on_shop_type"
+    t.index ["slug"], name: "index_shops_on_slug", unique: true
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

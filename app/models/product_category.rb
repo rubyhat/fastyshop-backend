@@ -19,20 +19,27 @@ class ProductCategory < ApplicationRecord
   has_many :children, class_name: "ProductCategory", foreign_key: :parent_id, dependent: :destroy
 
   validates :title, presence: true, length: { maximum: 100 }
+  validates :slug, presence: true, length: { maximum: 200 }
   validates :level, inclusion: { in: 0..3 }
   validates :position, numericality: { greater_than_or_equal_to: 0 }
 
-  validate :shop_category_limit
+  validates_with ProductCategoryBaseValidator
+  validates_with ProductCategoryCreateValidator, on: :create
+  validates_with ProductCategoryUpdateValidator, on: :update
 
   private
 
-  # Ограничивает общее количество категорий и подкатегорий в рамках одного магазина (до 20)
-  def shop_category_limit
-    return if shop.nil?
+  def generate_slug
+    return if slug.present? && slug_changed?
+    base_slug = title.parameterize[0..99]
+    candidate = base_slug
+    counter = 1
 
-    existing_count = shop.product_categories.count
-    if new_record? && existing_count >= 20
-      errors.add(:base, "Превышено максимальное количество категорий и подкатегорий в магазине (20)")
+    while shop&.product_categories&.where&.not(id: id)&.exists?(slug: candidate) do
+      counter += 1
+      candidate = "#{base_slug}-#{counter}"
     end
+
+    self.slug = candidate
   end
 end

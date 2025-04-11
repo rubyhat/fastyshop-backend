@@ -2,6 +2,7 @@ class Shop < ApplicationRecord
   belongs_to :seller_profile
   belongs_to :legal_profile
   belongs_to :shop_category
+  has_many :product_categories, dependent: :destroy
 
   enum :shop_type, {
     online: 1,

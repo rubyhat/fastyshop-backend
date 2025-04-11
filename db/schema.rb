@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_09_202728) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_11_182237) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -35,6 +35,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_09_202728) do
     t.datetime "updated_at", null: false
     t.index ["seller_profile_id"], name: "index_legal_profiles_on_seller_profile_id"
     t.index ["tax_id"], name: "index_legal_profiles_on_tax_id", unique: true
+  end
+
+  create_table "product_categories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "shop_id", null: false
+    t.string "title", null: false
+    t.string "slug", null: false
+    t.uuid "parent_id"
+    t.integer "level", default: 0, null: false
+    t.integer "position", default: 0, null: false
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["is_active"], name: "index_product_categories_on_is_active"
+    t.index ["level"], name: "index_product_categories_on_level"
+    t.index ["parent_id"], name: "index_product_categories_on_parent_id"
+    t.index ["position"], name: "index_product_categories_on_position"
+    t.index ["shop_id"], name: "index_product_categories_on_shop_id"
+    t.index ["title"], name: "index_product_categories_on_title"
   end
 
   create_table "seller_profiles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -96,4 +114,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_09_202728) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["phone"], name: "index_users_on_phone", unique: true
   end
+
+  add_foreign_key "product_categories", "shops"
 end

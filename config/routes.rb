@@ -33,6 +33,9 @@ Rails.application.routes.draw do
         collection do
           get :catalog
         end
+
+        # Категории товаров/услуг магазина
+        resources :product_categories, only: %i[index show create update destroy]
       end
 
       # Категории магазинов

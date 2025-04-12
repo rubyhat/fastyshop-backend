@@ -9,9 +9,6 @@ class ProductCategoryCreateValidator < ActiveModel::Validator
   MAX_CATEGORIES_PER_SHOP = 20
 
   def validate(record)
-    validate_level(record)
-    validate_slug_uniqueness(record)
-    validate_parent_exists(record)
     validate_category_limit(record)
   end
 

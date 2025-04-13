@@ -19,18 +19,23 @@ class Product < ApplicationRecord
   belongs_to :shop
   belongs_to :product_category, optional: true
 
-  has_many :product_property_values, dependent: :destroy
+  # has_many :product_property_values, dependent: :destroy
 
-  enum product_type: { product: 0, service: 1 }
+  enum :product_type, { product: 0, service: 1 }
+
+  before_validation :generate_slug, on: :create
+  before_validation :assign_position, on: :create
+
+  validates_with ProductBaseValidator
+  validates_with ProductCreateValidator, on: :create
+  validates_with ProductUpdateValidator, on: :update
+  validates_with ProductDestroyValidator, on: :destroy
 
   validates :title, presence: true, length: { maximum: 150 }
   validates :slug, presence: true, length: { maximum: 200 }
   validates :price, numericality: { greater_than_or_equal_to: 0 }
   validates :product_type, presence: true
   validates :position, numericality: { greater_than_or_equal_to: 0 }
-
-  before_validation :generate_slug, on: :create
-  before_validation :assign_position, on: :create
 
   private
 

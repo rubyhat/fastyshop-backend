@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
-require "pp"
 module Api
   module V1
     class ProductCategoriesController < BaseController
+      skip_before_action :authenticate_user!, only: %i[index show]
+
       before_action :set_shop
       before_action :set_product_category, only: %i[show update destroy]
       before_action :authorize_product_category!, only: %i[create update destroy]
@@ -16,7 +17,6 @@ module Api
 
       # GET /shops/:shop_id/product_categories/:id
       def show
-        authorize @product_category
         render json: @product_category, status: :ok
       end
 
@@ -24,8 +24,6 @@ module Api
       def create
         @product_category = @shop.product_categories.new(product_category_params)
         authorize @product_category
-        pp "PRODUCT_CATEGORY"
-        pp @product_category
 
         if @product_category.save
           render json: @product_category, status: :created

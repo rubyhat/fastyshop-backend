@@ -30,7 +30,8 @@ class ShopPolicy < ApplicationPolicy
         elsif user&.seller_profile
           scope.where(seller_profile_id: user.seller_profile.id)
         else
-          scope.none
+          # Покупатель — видит только активные магазины конкретного продавца
+          scope.where(seller_profile_id: user&.seller_profile&.id, is_active: true)
         end
       end
     end

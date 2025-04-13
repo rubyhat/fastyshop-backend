@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "pp"
 # Модель категории или подкатегории товара/услуги.
 #
 # @!attribute id [r] UUID категории
@@ -41,11 +40,8 @@ class ProductCategory < ApplicationRecord
 
   # Генерирует уникальный slug на основе title в рамках магазина.
   def generate_slug
-    pp "enter in generate slug 1"
-    pp title
-    pp shop
     return if title.blank? || shop.blank?
-    pp "Enter in generate slug 2"
+
     base_slug = title.to_s.parameterize[0..99] # todo: работает только с en, для ru, kz нужно добавить обработку
     candidate = base_slug
     counter = 1
@@ -54,7 +50,6 @@ class ProductCategory < ApplicationRecord
       counter += 1
       candidate = "#{base_slug}-#{counter}"
     end
-    pp candidate
     self.slug = candidate
   end
 

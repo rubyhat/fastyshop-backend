@@ -1,5 +1,3 @@
-require "pp"
-
 module Api
   module V1
     class ShopsController < BaseController

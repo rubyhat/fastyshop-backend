@@ -5,4 +5,6 @@
 # Использует только общие проверки.
 #
 class ProductCategoryUpdateValidator < ActiveModel::Validator
+  def validate(record)
+  end
 end

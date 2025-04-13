@@ -17,6 +17,7 @@ class ProductCategory < ApplicationRecord
   belongs_to :shop
   belongs_to :parent, class_name: "ProductCategory", optional: true
   has_many :children, class_name: "ProductCategory", foreign_key: :parent_id, dependent: :destroy
+  has_many :products, dependent: :destroy
 
   before_validation :assign_level
   before_validation :generate_slug, on: [ :create, :update ]

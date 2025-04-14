@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_13_182047) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_14_102532) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -53,6 +53,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_13_182047) do
     t.index ["position"], name: "index_product_categories_on_position"
     t.index ["shop_id"], name: "index_product_categories_on_shop_id"
     t.index ["title"], name: "index_product_categories_on_title"
+  end
+
+  create_table "product_properties", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "title", null: false
+    t.integer "value_type", null: false
+    t.integer "source_type", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source_type"], name: "index_product_properties_on_source_type"
+    t.index ["user_id", "title", "source_type"], name: "index_product_properties_on_user_id_and_title_and_source_type", unique: true
+    t.index ["user_id"], name: "index_product_properties_on_user_id"
   end
 
   create_table "products", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -137,6 +149,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_13_182047) do
   end
 
   add_foreign_key "product_categories", "shops"
+  add_foreign_key "product_properties", "users"
   add_foreign_key "products", "product_categories"
   add_foreign_key "products", "shops"
 end

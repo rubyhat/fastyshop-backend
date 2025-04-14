@@ -13,7 +13,7 @@
 class ProductProperty < ApplicationRecord
   belongs_to :user, optional: true
 
-  # has_many :product_property_values, dependent: :destroy
+  has_many :product_property_values, dependent: :destroy
   # has_many :product_property_shop_category_templates, dependent: :destroy
 
   enum :value_type, {

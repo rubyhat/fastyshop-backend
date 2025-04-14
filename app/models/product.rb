@@ -18,6 +18,7 @@
 class Product < ApplicationRecord
   belongs_to :shop
   belongs_to :product_category, optional: true
+  has_many :product_property_values, dependent: :destroy
 
   # has_many :product_property_values, dependent: :destroy
 

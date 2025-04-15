@@ -9,6 +9,5 @@ FactoryBot.define do
     association :seller_profile
     association :legal_profile
     association :shop_category
-    association :product_categories
   end
 end

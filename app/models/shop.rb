@@ -27,17 +27,21 @@ class Shop < ApplicationRecord
 
   def generate_slug
     return if slug.present? && slug_changed?
-    errors.add(:base, "Не задано название магазина") unless title
+    return errors.add(:base, "Не задано название магазина") unless title
 
     base_slug = title.to_s.parameterize[0..99]
     candidate = base_slug
     counter = 1
 
-    while Shop.exists?(slug: candidate)
+    while self.class.where.not(id: self.id).exists?(slug: candidate)
       counter += 1
       candidate = "#{base_slug}-#{counter}"
     end
 
-    self.slug = candidate
+    if candidate
+      self.slug = candidate
+    else
+      errors.add(:base, "Slug не был сгенерирован")
+    end
   end
 end

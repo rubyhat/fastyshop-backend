@@ -1,8 +1,35 @@
 # Makefile — Упрощает команды Docker Compose для разработки и продакшена
 
 # Переменные окружения по умолчанию
+ENV_FILE_TEST=.env.test
 ENV_FILE_DEV=.env.development
 ENV_FILE_PROD=.env.production
+
+# ========================
+# 👨‍💻 TEST
+# ========================
+
+test-build:
+	docker compose --env-file $(ENV_FILE_TEST) build web-test
+
+test:
+	make test-build
+	docker compose --env-file $(ENV_FILE_TEST) run --rm web-test bundle exec rspec
+
+test-file:
+	make test-build
+	docker compose --env-file $(ENV_FILE_TEST) run --rm web-test bundle exec rspec $(f)
+
+test-db-create:
+	docker compose --env-file $(ENV_FILE_TEST) run --rm web-test bundle exec rails db:create
+
+test-db-migrate:
+	docker compose --env-file $(ENV_FILE_TEST) run --rm web-test bundle exec rails db:migrate
+
+test-db-prepare:
+	docker compose --env-file $(ENV_FILE_TEST) run --rm web-test bundle exec rails db:prepare
+
+
 
 # ========================
 # 👨‍💻 DEVELOPMENT

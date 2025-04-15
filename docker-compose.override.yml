@@ -1,4 +1,18 @@
 services:
+  web-test:
+    build:
+      context: .
+      args:
+        TARGET_PLATFORM: ${TARGET_PLATFORM:-linux/arm64}
+    container_name: kagi-backend-test
+    command: [ "sleep", "infinity" ]
+    env_file:
+      - .env.test
+    environment:
+      RAILS_ENV: test
+    depends_on:
+      - db
+      - redis
   # 📦 Rails-приложение (API-only backend)
   web:
     # В development окружении монтируем локальную папку внутрь контейнера

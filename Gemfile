@@ -44,6 +44,20 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  # Tests
+  gem 'rspec-rails', '~> 7.1', '>= 7.1.1'
+  gem 'factory_bot_rails', '~> 6.4', '>= 6.4.4'
+  gem 'faker', '~> 3.5', '>= 3.5.1'
+
+  gem 'rswag', '~> 2.16'
+  gem 'rswag-ui', '~> 2.16'
+  gem 'rswag-api', '~> 2.16'
+end
+
+group :test do
+  gem 'database_cleaner-active_record'
+  gem 'shoulda-matchers'
 end
 
 gem "jwt", "~> 2.10"
@@ -58,8 +72,6 @@ gem "pagy", "~> 9.3"
 gem "aws-sdk-s3", "~> 1.183"
 gem "image_processing", "~> 1.14"
 gem "sidekiq", "~> 8.0"
-gem "rspec-rails", "~> 7.1"
-gem "factory_bot_rails", "~> 6.4"
 gem "bcrypt", "~> 3.1", ">= 3.1.20"
 gem "redis", "~> 5.4"
 gem "pundit", "~> 2.5"

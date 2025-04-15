@@ -20,8 +20,6 @@ class Product < ApplicationRecord
   belongs_to :product_category, optional: true
   has_many :product_property_values, dependent: :destroy
 
-  # has_many :product_property_values, dependent: :destroy
-
   enum :product_type, { product: 0, service: 1 }
 
   before_validation :generate_slug, on: :create

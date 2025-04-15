@@ -9,7 +9,7 @@ module Api
       before_action :set_product, only: %i[show update destroy]
 
       def index
-        products = policy_scope(@shop.products.includes(:product_category))
+        products = policy_scope(@shop.products.includes(:product_category, product_property_values: :product_property))
         render json: products, status: 200
       end
 

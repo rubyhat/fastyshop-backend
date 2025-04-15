@@ -38,7 +38,9 @@ Rails.application.routes.draw do
         resources :product_categories, only: %i[index show create update destroy]
 
         # Товары/услуги магазина
-        resources :products, only: %i[index show create update destroy]
+        resources :products, only: %i[index show create update destroy] do
+          resources :product_property_values, only: %i[index show create update destroy]
+        end
       end
 
       # Категории магазинов

@@ -13,25 +13,11 @@ class ProductPropertyValue < ApplicationRecord
   belongs_to :product
   belongs_to :product_property
 
+  validates_with ProductPropertyValueBaseValidator
+  validates_with ProductPropertyValueCreateValidator, on: :create
+  validates_with ProductPropertyValueUpdateValidator, on: :update
+
+
   validates :value, presence: true
   validates :product_id, uniqueness: { scope: :product_property_id, message: "значение свойства уже задано" }
-
-  validate :value_type_must_match
-
-  private
-
-  def value_type_must_match
-    return if product_property.blank?
-
-    case product_property.value_type
-    when "number"
-      errors.add(:value, "должно быть числом") unless value.to_s.match?(/\A-?\d+(\.\d+)?\z/)
-    when "boolean"
-      unless %w[true false 1 0].include?(value.to_s.strip.downcase)
-        errors.add(:value, "должно быть true/false или 1/0")
-      end
-    else
-      # "Тип string не требует дополнительной валидации"
-    end
-  end
 end

@@ -10,9 +10,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_14_124409) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_16_222238) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "cart_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "cart_id", null: false
+    t.uuid "product_id", null: false
+    t.integer "quantity", default: 1, null: false
+    t.decimal "price_snapshot", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cart_id", "product_id"], name: "index_cart_items_on_cart_id_and_product_id", unique: true
+    t.index ["cart_id"], name: "index_cart_items_on_cart_id"
+    t.index ["product_id"], name: "index_cart_items_on_product_id"
+  end
+
+  create_table "carts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.uuid "shop_id", null: false
+    t.datetime "expired_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["shop_id"], name: "index_carts_on_shop_id"
+    t.index ["user_id", "shop_id"], name: "index_carts_on_user_id_and_shop_id", unique: true
+    t.index ["user_id"], name: "index_carts_on_user_id"
+  end
 
   create_table "countries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "code", null: false
@@ -159,6 +182,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_14_124409) do
     t.index ["phone"], name: "index_users_on_phone", unique: true
   end
 
+  add_foreign_key "cart_items", "carts"
+  add_foreign_key "cart_items", "products"
+  add_foreign_key "carts", "shops"
+  add_foreign_key "carts", "users"
   add_foreign_key "product_categories", "shops"
   add_foreign_key "product_properties", "users"
   add_foreign_key "product_property_values", "product_properties"

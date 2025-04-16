@@ -26,7 +26,7 @@ module Api
         else
           render_error(
             key: "auth.invalid_credentials",
-            message: "Invalid phone or password",
+            message: "Неверный логин или пароль",
             status: :unauthorized,
             code: 401
           )

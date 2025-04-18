@@ -26,7 +26,7 @@ module Api
            )
          end
 
-        address = user&.user_addresses&.find_by(id: order_params[:user_address_id])
+        address = user&.user_addresses&.find_by(id: order_create_params[:user_address_id])
         return render_error(
           key: "order.user_address_not_found",
           message: "Адрес доставки пользователя не найдена",
@@ -36,8 +36,8 @@ module Api
 
         order = user.orders.new(
           shop_id: params[:shop_id],
-          delivery_method: order_params[:delivery_method],
-          payment_method: order_params[:payment_method],
+          delivery_method: order_create_params[:delivery_method],
+          payment_method: order_create_params[:payment_method],
           status: :created,
           contact_name: address.contact_name,
           contact_phone: address.contact_phone,
@@ -86,14 +86,59 @@ module Api
         render json: orders, each_serializer: OrderSerializer, status: :ok
       end
 
+      # PATCH /api/v1/orders/:id/status
+      def update_status
+        order = Order.find(params[:id])
+        authorize order, :update_status?
+
+        new_status = order_update_status_params[:status].to_s
+        status_comment = order_update_status_params[:status_comment].to_s
+
+        unless Order.statuses.key?(new_status)
+          return render_error(
+            key: "order.invalid_status",
+            message: "Недопустимый статус",
+            code: 422,
+            status: :unprocessable_entity
+          )
+        end
+
+        if %w[canceled_by_user canceled_by_seller].include?(new_status) && status_comment.blank?
+          return render_error(
+            key: "order.comment_required",
+            message: "Комментарий обязателен при отмене заказа",
+            code: 422,
+            status: :unprocessable_entity
+          )
+        end
+
+        order.status = new_status
+        order.status_comment = status_comment if status_comment.present?
+        order.canceled_by_user = true if new_status == "canceled_by_user"
+
+        if order.save
+          render json: order, serializer: OrderSerializer, status: :ok
+        else
+          render_validation_errors(order)
+        end
+      end
+
+
 
       private
 
-      def order_params
+      def order_create_params
         params.required(:order).permit(
         :user_address_id,
         :delivery_method,
         :payment_method
+        )
+      end
+
+      def order_update_status_params
+        params.required(:order).permit(
+        :status,
+        :status_comment,
         )
       end
 

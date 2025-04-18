@@ -10,6 +10,8 @@ module Api
 
 
       before_action :authenticate_user!
+      before_action { Current.user = current_user }
+
 
       private
 
@@ -29,7 +31,7 @@ module Api
       def current_user
         @current_user ||= begin
                             token = request.headers["Authorization"]&.split&.last
-                            payload = JwtService.decode_and_verify(token)
+                            payload = JwtService.decode_and_verify(token && token)
                             if payload.present? && payload["type"] == "access"
                               User.find_by(id: payload["sub"])
                             else

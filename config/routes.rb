@@ -70,6 +70,7 @@ Rails.application.routes.draw do
       end
       get "/my/orders", to: "orders#my_orders"
       get "/shops/:shop_id/orders", to: "orders#shop_orders"
+      patch "/orders/:id/status", to: "orders#update_status"
     end
   end
 end

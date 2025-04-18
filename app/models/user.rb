@@ -27,6 +27,7 @@ class User < ApplicationRecord
   has_secure_password
   has_one :seller_profile, dependent: :destroy
   has_many :product_properties, dependent: :destroy
+  has_many :user_addresses, dependent: :destroy
 
   enum :role, {
     superadmin: 0,

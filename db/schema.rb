@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_16_222238) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_18_110553) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -169,6 +169,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_16_222238) do
     t.index ["slug"], name: "index_shops_on_slug", unique: true
   end
 
+  create_table "user_addresses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id"
+    t.string "label", null: false
+    t.string "country_code", null: false
+    t.string "city", null: false
+    t.string "street", null: false
+    t.string "house", null: false
+    t.string "apartment"
+    t.string "postal_code"
+    t.string "contact_name", null: false
+    t.string "contact_phone", null: false
+    t.boolean "is_default", default: false, null: false
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "is_default"], name: "idx_one_default_address_per_user", unique: true, where: "(is_default = true)"
+    t.index ["user_id"], name: "index_user_addresses_on_user_id"
+  end
+
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "phone", null: false
     t.string "email", null: false
@@ -192,4 +211,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_16_222238) do
   add_foreign_key "product_property_values", "products"
   add_foreign_key "products", "product_categories"
   add_foreign_key "products", "shops"
+  add_foreign_key "user_addresses", "users"
 end

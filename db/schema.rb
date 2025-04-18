@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_18_110553) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_18_135747) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -58,6 +58,41 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_18_110553) do
     t.datetime "updated_at", null: false
     t.index ["seller_profile_id"], name: "index_legal_profiles_on_seller_profile_id"
     t.index ["tax_id"], name: "index_legal_profiles_on_tax_id", unique: true
+  end
+
+  create_table "order_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "order_id", null: false
+    t.uuid "product_id", null: false
+    t.integer "quantity", null: false
+    t.decimal "price", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id", "product_id"], name: "index_order_items_on_order_id_and_product_id", unique: true
+    t.index ["order_id"], name: "index_order_items_on_order_id"
+    t.index ["product_id"], name: "index_order_items_on_product_id"
+  end
+
+  create_table "orders", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.uuid "shop_id", null: false
+    t.integer "status", default: 0, null: false
+    t.integer "delivery_type", null: false
+    t.integer "payment_type", null: false
+    t.decimal "total_price", precision: 10, scale: 2, null: false
+    t.string "contact_name", null: false
+    t.string "contact_phone", null: false
+    t.string "delivery_address_text", null: false
+    t.string "delivery_comment"
+    t.string "status_comment"
+    t.boolean "canceled_by_user", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_orders_on_created_at"
+    t.index ["shop_id", "status"], name: "index_orders_on_shop_id_and_status"
+    t.index ["shop_id"], name: "index_orders_on_shop_id"
+    t.index ["status"], name: "index_orders_on_status"
+    t.index ["user_id", "status"], name: "index_orders_on_user_id_and_status"
+    t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
   create_table "product_categories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -205,6 +240,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_18_110553) do
   add_foreign_key "cart_items", "products"
   add_foreign_key "carts", "shops"
   add_foreign_key "carts", "users"
+  add_foreign_key "order_items", "orders"
+  add_foreign_key "order_items", "products"
+  add_foreign_key "orders", "shops"
+  add_foreign_key "orders", "users"
   add_foreign_key "product_categories", "shops"
   add_foreign_key "product_properties", "users"
   add_foreign_key "product_property_values", "product_properties"

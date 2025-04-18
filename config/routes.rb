@@ -20,6 +20,9 @@ Rails.application.routes.draw do
         get :seller_profile, to: "seller_profiles#show_by_user"
       end
 
+      # Адреса пользователей
+      resources :user_addresses, only: %i[index show create update destroy]
+
       # Профиль продавца
       resources :seller_profiles, only: %i[create update show index]
 

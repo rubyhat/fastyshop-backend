@@ -12,12 +12,12 @@ class CartPolicy < ApplicationPolicy
   end
 
   # Пользователь может создавать корзину только для себя
-  def create?
+  def add_item?
     user.present?
   end
 
   # Пользователь может удалять товары из своей корзины
-  def destroy?
+  def remove_item?
     user.present? && record.user_id == user.id
   end
 

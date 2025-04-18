@@ -21,4 +21,16 @@ class CartItem < ApplicationRecord
   validates :cart_id, :product_id, :quantity, :price_snapshot, presence: true
   validates :quantity, numericality: { greater_than: 0 }
   validates :product_id, uniqueness: { scope: :cart_id }
+
+  validate :product_belongs_to_same_shop
+
+  private
+
+  # Продукт должен принадлежать тому же магазину, что и корзина
+  def product_belongs_to_same_shop
+    return unless cart && product
+    if cart.shop_id != product.shop_id
+      errors.add(:product_id, "Товар не принадлежит магазину корзины")
+    end
+  end
 end

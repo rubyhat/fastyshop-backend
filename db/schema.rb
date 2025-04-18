@@ -17,7 +17,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_16_222238) do
   create_table "cart_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "cart_id", null: false
     t.uuid "product_id", null: false
-    t.integer "quantity", default: 1, null: false
+    t.integer "quantity", null: false
     t.decimal "price_snapshot", precision: 10, scale: 2, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

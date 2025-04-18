@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
-  mount Rswag::Ui::Engine => '/api-docs'
-  mount Rswag::Api::Engine => '/api-docs'
+  mount Rswag::Ui::Engine => "/api-docs"
+  mount Rswag::Api::Engine => "/api-docs"
   get "up" => "rails/health#show", as: :rails_health_check
   get "status", to: "health#status"
 
@@ -50,6 +50,14 @@ Rails.application.routes.draw do
 
       # Коллекция свойств для товаров/услуг
       resources :product_properties, only: %i[index show create update destroy]
+
+      # Корзины пользователя в магазине
+      resources :carts, only: %i[index show], param: :shop_id do
+        member do
+          post "add", to: "carts#add_item"
+          post "remove/:product_id", to: "carts#remove_item"
+        end
+      end
     end
   end
 end

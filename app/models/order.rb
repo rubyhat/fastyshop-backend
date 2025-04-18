@@ -13,7 +13,7 @@ class Order < ApplicationRecord
     completed: 4,
     canceled_by_user: 5,
     canceled_by_seller: 6
-  }, _suffix: true
+  }, suffix: true
 
   enum :delivery_method, {
     courier: 0,

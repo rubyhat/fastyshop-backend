@@ -28,6 +28,8 @@ class User < ApplicationRecord
   has_one :seller_profile, dependent: :destroy
   has_many :product_properties, dependent: :destroy
   has_many :user_addresses, dependent: :destroy
+  has_many :carts, dependent: :destroy
+  has_many :orders, dependent: :destroy
 
   enum :role, {
     superadmin: 0,

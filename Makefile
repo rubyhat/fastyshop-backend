@@ -69,7 +69,7 @@ db-up:
 
 ## 🧪 Откат последней миграции (db:rollback)
 db-rollback:
-	docker compose --env-file $(ENV_FILE_DEV) exec web bin/rails db:rollback
+	docker compose --env-file $(ENV_FILE_DEV) exec web bin/rails db:rollback STEP=$(STEP)
 
 ## ⬇️ Откатить конкретную миграцию по VERSION
 db-down:

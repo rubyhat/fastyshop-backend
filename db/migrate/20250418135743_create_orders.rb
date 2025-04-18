@@ -5,8 +5,8 @@ class CreateOrders < ActiveRecord::Migration[8.0]
       t.references :shop, foreign_key: true, type: :uuid, null: false
 
       t.integer :status, null: false, default: 0
-      t.integer :delivery_type, null: false
-      t.integer :payment_type, null: false
+      t.integer :delivery_method, null: false
+      t.integer :payment_method, null: false
 
       t.decimal :total_price, precision: 10, scale: 2, null: false
 

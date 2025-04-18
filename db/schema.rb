@@ -76,8 +76,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_18_135747) do
     t.uuid "user_id", null: false
     t.uuid "shop_id", null: false
     t.integer "status", default: 0, null: false
-    t.integer "delivery_type", null: false
-    t.integer "payment_type", null: false
+    t.integer "delivery_method", null: false
+    t.integer "payment_method", null: false
     t.decimal "total_price", precision: 10, scale: 2, null: false
     t.string "contact_name", null: false
     t.string "contact_phone", null: false

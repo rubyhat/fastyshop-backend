@@ -61,6 +61,15 @@ Rails.application.routes.draw do
           post "remove/:product_id", to: "carts#remove_item"
         end
       end
+
+      # Заказы
+      resources :orders, only: %i[index show] do
+        collection do
+          post "from_cart/:shop_id", to: "orders#create_from_cart"
+        end
+      end
+      get "/my/orders", to: "orders#my_orders"
+      get "/shops/:shop_id/orders", to: "orders#shop_orders"
     end
   end
 end

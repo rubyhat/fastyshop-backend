@@ -19,6 +19,11 @@ class ShopPolicy < ApplicationPolicy
       user.superadmin? || user.supermanager? || owns_shop?
     end
 
+    def manage_orders?
+      user.present? && record.seller_profile.user_id == user.id
+    end
+
+
     class Scope < Scope
       def resolve_catalog
         scope.where(is_active: true)

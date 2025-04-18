@@ -56,6 +56,22 @@ module Api
 
         order.total_price = order.order_items.sum(BigDecimal("0")) { |oi| oi.quantity.to_d * oi.price }
 
+        # Проверяем, что товара в заказе меньше или равно количеству остатков на складе
+        order.order_items.each do |item|
+          if item.quantity > item.product.stock_quantity
+            return render_error(
+              key: "order.out_of_stock",
+              message: "Недостаточно товара на складе для '#{item.product.title}'",
+              code: :unprocessable_entity,
+              status: :unprocessable_entity
+            )
+          end
+        end
+
+        # После успешного сохранения заказа — уменьшаем количество на складе
+        order.order_items.each do |item|
+          item.product.decrement!(:stock_quantity, item.quantity)
+        end
 
         if order.save
           cart.destroy

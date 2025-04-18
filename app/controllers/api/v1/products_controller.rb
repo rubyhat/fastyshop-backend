@@ -69,7 +69,8 @@ module Api
           :description,
           :price,
           :product_type,
-          :product_category_id
+          :product_category_id,
+          :stock_quantity
         )
       end
 
@@ -81,7 +82,8 @@ module Api
           :product_type,
           :product_category_id,
           :is_active,
-          :position
+          :position,
+          :stock_quantity
         )
       end
     end

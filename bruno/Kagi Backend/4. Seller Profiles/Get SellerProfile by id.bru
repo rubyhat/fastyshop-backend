@@ -1,0 +1,15 @@
+meta {
+  name: Get SellerProfile by id
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{URL}}/seller_profiles/1d449312-75f8-479f-9292-11550a894fc8
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

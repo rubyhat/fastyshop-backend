@@ -1,0 +1,21 @@
+meta {
+  name: Get current User
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{URL}}/me
+  body: none
+  auth: bearer
+}
+
+headers {
+  ~Authorization: Bearer {{access_token}}
+  Bearer {{access_token}}
+  Bearer {{access_token}}
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

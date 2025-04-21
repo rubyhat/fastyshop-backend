@@ -1,0 +1,15 @@
+meta {
+  name: Get all LegalProfiles
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{URL}}/legal_profiles
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

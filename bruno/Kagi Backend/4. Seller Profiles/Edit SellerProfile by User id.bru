@@ -1,0 +1,22 @@
+meta {
+  name: Edit SellerProfile by User id
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{URL}}/seller_profiles/1d449312-75f8-479f-9292-11550a894fc8?description=Patched desc
+  body: none
+  auth: bearer
+}
+
+query {
+  description: Patched desc
+  ~display_name: null
+  ~slug: null
+  ~logo_url: null
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

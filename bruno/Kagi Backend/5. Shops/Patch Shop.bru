@@ -1,0 +1,26 @@
+meta {
+  name: Patch Shop
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{URL}}/shops/cbc3c949-096e-4031-a848-7357417bb7cf?title=My test shop patched in postman
+  body: none
+  auth: bearer
+}
+
+query {
+  title: My test shop patched in postman
+  ~contact_phone: 77001234567
+  ~contact_email: test@kagi.com
+  ~physical_address: Kazakhstan, Almaty, 123
+  ~shop_type: online
+  ~shop_category_id: a0c948ca-01e1-4975-9ea7-5feffbe61446
+  ~legal_profile_id: 785de588-c4fe-4d62-9d96-77233c0c27bf
+  ~seller_profile_id: 2cf30539-7f64-49c3-98d1-4d12121f2e5e
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

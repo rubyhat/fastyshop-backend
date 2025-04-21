@@ -1,0 +1,15 @@
+meta {
+  name: Destroy the ProductCategory by id
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{URL}}/shops/7ead8b23-82bd-4e70-bd09-f4a5de0cb9d4/product_categories/c96998f0-87b8-4f73-be8c-83a187b37946
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

@@ -1,0 +1,19 @@
+meta {
+  name: Unverify LegalProfile
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{URL}}/legal_profiles/6c096f83-f446-4839-97d7-f48b4ed18eaa?is_verified=false
+  body: none
+  auth: bearer
+}
+
+query {
+  is_verified: false
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

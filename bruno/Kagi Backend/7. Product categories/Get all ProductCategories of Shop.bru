@@ -1,0 +1,15 @@
+meta {
+  name: Get all ProductCategories of Shop
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{URL}}/shops/7ead8b23-82bd-4e70-bd09-f4a5de0cb9d4/product_categories
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

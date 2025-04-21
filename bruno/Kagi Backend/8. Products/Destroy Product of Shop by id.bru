@@ -1,0 +1,15 @@
+meta {
+  name: Destroy Product of Shop by id
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{URL}}/shops/7ead8b23-82bd-4e70-bd09-f4a5de0cb9d4/products/11e05a4a-73e1-4582-b93a-0e1b0b3577ee
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

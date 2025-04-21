@@ -1,0 +1,26 @@
+name: Deploy to Dev VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: SSH Deploy to VPS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Connect and Deploy over SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_PRIVATE_KEY }}
+          script: |
+            echo "🛠 Начинаем деплой fastyshop-backend..."
+            cd ~/apps/fastyshop-backend
+            git pull origin main
+            docker compose --env-file .env.development down
+            docker compose --env-file .env.development up --build -d
+            echo "✅ Деплой завершён"

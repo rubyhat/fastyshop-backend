@@ -1,0 +1,21 @@
+meta {
+  name: Patch User
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{URL}}/users/2e5d4ecd-8281-4c74-b6f9-4336a881f654
+  body: multipartForm
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:multipart-form {
+  phone: 77005555555
+  ~email: 
+  ~password: 
+}

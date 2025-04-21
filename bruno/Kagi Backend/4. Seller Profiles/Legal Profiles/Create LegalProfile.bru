@@ -1,0 +1,23 @@
+meta {
+  name: Create LegalProfile
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{URL}}/legal_profiles?company_name=ИП BestSeller&tax_id=223456789000&country_code=KZ&legal_address=Test legal address&legal_form=Индивидуальный предприниматель "BestSeller"
+  body: none
+  auth: bearer
+}
+
+query {
+  company_name: ИП BestSeller
+  tax_id: 223456789000
+  country_code: KZ
+  legal_address: Test legal address
+  legal_form: Индивидуальный предприниматель "BestSeller"
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

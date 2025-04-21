@@ -1,0 +1,25 @@
+meta {
+  name: Update ProductPropertyValue
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{URL}}/shops/7ead8b23-82bd-4e70-bd09-f4a5de0cb9d4/products/e010831d-1b6c-4bca-ae2e-54f0e6361bcf/product_property_values/3251952d-0689-418b-a345-cc8e89a00cce
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "product_property_value": {
+      // "product_property_id": "1de6985a-1a9e-4ff2-9691-1ac22d206989", // Если нужно заменить свойство
+      "value": "Белый"
+    }
+  }
+  
+}

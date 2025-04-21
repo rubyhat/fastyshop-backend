@@ -1,0 +1,27 @@
+meta {
+  name: Create Shop
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{URL}}/shops?title=My test shop&contact_phone=77001234567&contact_email=test@kagi.com&physical_address=Kazakhstan, Almaty, 123&shop_type=online&shop_category_id=8367b16a-2c68-454f-87a7-801bf05fe368&legal_profile_id=7cfedd7a-ac5d-42a9-bb89-6dd6e830733b&seller_profile_id=260ba9b9-9b4f-4f63-bac6-6970e421b87a
+  body: none
+  auth: bearer
+}
+
+query {
+  title: My test shop
+  contact_phone: 77001234567
+  contact_email: test@kagi.com
+  physical_address: Kazakhstan, Almaty, 123
+  shop_type: online
+  shop_category_id: 8367b16a-2c68-454f-87a7-801bf05fe368
+  legal_profile_id: 7cfedd7a-ac5d-42a9-bb89-6dd6e830733b
+  seller_profile_id: 260ba9b9-9b4f-4f63-bac6-6970e421b87a
+  ~slug: 
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

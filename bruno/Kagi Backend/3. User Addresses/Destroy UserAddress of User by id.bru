@@ -1,0 +1,15 @@
+meta {
+  name: Destroy UserAddress of User by id
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{URL}}/user_addresses/9049321d-49c1-43bb-9fc6-689e3829922a
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

@@ -1,0 +1,27 @@
+meta {
+  name: Logout
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{URL}}/auth/logout
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+script:post-response {
+  if (res.status === 200 || res.status === 204) {
+    // Удаляем токены после успешного логаута
+  bru.setEnvVar("access_token", "");
+  bru.setEnvVar("refresh_token", "");
+  bru.setEnvVar("access_token_exp", "");
+  
+  console.log("🧹 Токены очищены: access_token, refresh_token, access_token_exp");
+  }
+  
+}

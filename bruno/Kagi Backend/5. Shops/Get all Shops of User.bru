@@ -1,0 +1,15 @@
+meta {
+  name: Get all Shops of User
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{URL}}/shops
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

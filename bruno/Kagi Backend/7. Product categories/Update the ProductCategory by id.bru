@@ -1,0 +1,26 @@
+meta {
+  name: Update the ProductCategory by id
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{URL}}/shops/7ead8b23-82bd-4e70-bd09-f4a5de0cb9d4/product_categories/80ce6749-f563-486f-b231-75363a600f0c
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+      "product_category":{
+          "title":"Flowers patched" // required
+          // "parent_id": "product_category_uuid" // Используется для создании подкатегории, если нужно создать главную категорию, то указывать не нужно
+          // "position": 1, // Задает положение в массиве
+          // "is_active": false, // Включает/отключает отображение этой категории в методах Get all и Get by id для всех пользователей, кроме оунера и админов
+      }
+  }
+}

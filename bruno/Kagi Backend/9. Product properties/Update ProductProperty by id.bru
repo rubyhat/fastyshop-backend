@@ -1,0 +1,24 @@
+meta {
+  name: Update ProductProperty by id
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{URL}}/product_properties/cce6dbd0-a34b-4d6d-88a2-89c1df7f2ce7
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "product_property": {
+      "title": "Цвет бутона"
+    }
+  }
+  
+}

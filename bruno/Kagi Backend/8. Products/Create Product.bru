@@ -1,0 +1,29 @@
+meta {
+  name: Create Product
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{URL}}/shops/0eb0be15-1729-4f1e-ba9e-7416503f39d3/products
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "product": {
+      "title": "Romashka",
+      "description": "Желтые ромашки",
+      "price": 1200,
+      "stock_quantity": 3,
+      "product_type": "product"
+      // "product_category_id": "80ce6749-f563-486f-b231-75363a600f0c" // Опциональный параметр, товар/услуга может быть вложена в категорию
+    }
+  }
+  
+}

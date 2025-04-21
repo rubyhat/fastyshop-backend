@@ -1,0 +1,24 @@
+meta {
+  name: Patch status of Order
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{URL}}/orders/591c3f01-0b08-4e6a-9140-46acf541dde0/status
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+      "order":{
+          "status": "created",
+          "status_comment": "Test cancel order by seller"
+      }
+  }
+}

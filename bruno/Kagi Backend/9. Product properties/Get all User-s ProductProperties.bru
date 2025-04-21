@@ -1,0 +1,15 @@
+meta {
+  name: Get all User-s ProductProperties
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{URL}}/product_properties
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

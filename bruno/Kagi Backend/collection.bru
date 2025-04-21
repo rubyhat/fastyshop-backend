@@ -1,0 +1,56 @@
+script:pre-request {
+  const fetch = require('node-fetch');
+  
+  const accessToken = bru.getEnvVar("access_token");
+  const refreshToken = bru.getEnvVar("refresh_token");
+  const tokenExp = parseInt(bru.getEnvVar("access_token_exp") || "0", 10);
+  const now = Math.floor(Date.now() / 1000); // в секундах
+  const baseUrl = bru.getEnvVar("URL") || "http://localhost:3000";
+  
+  
+  if ((!accessToken || now >= tokenExp) && refreshToken) {
+    console.log("🔄 Access token отсутствует или истёк. Обновляем через /auth/refresh...");
+  
+    // Собираем тело вручную в формате x-www-form-urlencoded
+    const formBody = `refresh_token=${encodeURIComponent(refreshToken)}`;
+  
+    try {
+      const response = await fetch.default(`${baseUrl}/auth/refresh`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: formBody
+      });
+  
+      if (!response.ok) {
+        console.error(`❌ Ошибка обновления токена: ${response.status} ${response.statusText}`);
+        return;
+      }
+  
+      const data = await response.json();
+  
+      if (data.access_token) {
+        bru.setEnvVar("access_token", data.access_token);
+        console.log("✅ access_token обновлён");
+      }
+  
+      if (data.refresh_token) {
+        bru.setEnvVar("refresh_token", data.refresh_token);
+        console.log("✅ refresh_token обновлён");
+      }
+  
+      const tokenParts = data.access_token.split(".");
+      if (tokenParts.length === 3) {
+        const payload = JSON.parse(Buffer.from(tokenParts[1], "base64").toString("utf8"));
+        if (payload.exp) {
+          bru.setEnvVar("access_token_exp", payload.exp.toString());
+          console.log("🕒 access_token_exp обновлён:", payload.exp);
+        }
+      }
+  
+    } catch (error) {
+      console.error(`❌ Ошибка выполнения fetch: ${error.message}`);
+    }
+  }
+}

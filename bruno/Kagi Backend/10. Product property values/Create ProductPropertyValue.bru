@@ -1,0 +1,25 @@
+meta {
+  name: Create ProductPropertyValue
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{URL}}/shops/0eb0be15-1729-4f1e-ba9e-7416503f39d3/products/efeb6ec5-f7fe-42e1-b805-bbfa6220c0a1/product_property_values
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "product_property_value": {
+      "product_property_id": "ad461654-aac4-4467-a1ba-4e8c624873c8",
+      "value": "Красный"
+    }
+  }
+  
+}

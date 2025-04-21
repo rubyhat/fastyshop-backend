@@ -1,0 +1,24 @@
+meta {
+  name: Create ProductCategory
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{URL}}/shops/7ead8b23-82bd-4e70-bd09-f4a5de0cb9d4/product_categories
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+      "product_category":{
+          "title":"Flowers" // required
+          // "parent_id": "product_category_uuid" // Используется для создании подкатегории, если нужно создать главную категорию, то указывать не нужно
+      }
+  }
+}

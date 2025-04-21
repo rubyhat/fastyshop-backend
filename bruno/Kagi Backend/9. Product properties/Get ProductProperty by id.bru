@@ -1,0 +1,15 @@
+meta {
+  name: Get ProductProperty by id
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{URL}}/product_properties/1de6985a-1a9e-4ff2-9691-1ac22d206989
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

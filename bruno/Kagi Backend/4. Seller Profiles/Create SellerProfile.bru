@@ -1,0 +1,22 @@
+meta {
+  name: Create SellerProfile
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{URL}}/seller_profiles?display_name=My seller profile&description=Seller profile description&logo_url=test url
+  body: none
+  auth: bearer
+}
+
+query {
+  display_name: My seller profile
+  description: Seller profile description
+  logo_url: test url
+  ~slug: test-store
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

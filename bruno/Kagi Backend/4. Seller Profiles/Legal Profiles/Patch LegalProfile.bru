@@ -1,0 +1,24 @@
+meta {
+  name: Patch LegalProfile
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{URL}}/legal_profiles/6c096f83-f446-4839-97d7-f48b4ed18eaa?is_verified=true
+  body: none
+  auth: bearer
+}
+
+query {
+  is_verified: true
+  ~company_name: null
+  ~tax_id: 777
+  ~country_code: null
+  ~legal_address: null
+  ~legal_form: null
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

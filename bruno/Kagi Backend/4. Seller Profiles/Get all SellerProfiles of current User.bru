@@ -1,0 +1,15 @@
+meta {
+  name: Get all SellerProfiles of current User
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{URL}}/seller_profiles
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

@@ -1,0 +1,20 @@
+meta {
+  name: Create New User
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{URL}}/users
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  email: user1@test.com
+  password: Test1234567!
+  password_confirmation: Test1234567!
+  role: superadmin
+  country_code: DE
+  phone: 77010000000
+}

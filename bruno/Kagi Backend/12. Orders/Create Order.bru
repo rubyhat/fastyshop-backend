@@ -1,0 +1,25 @@
+meta {
+  name: Create Order
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{URL}}/orders/from_cart/0eb0be15-1729-4f1e-ba9e-7416503f39d3
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "order": {
+      "user_address_id": "ffda7dbc-d76f-4921-bed8-1f560b0f3ff5",
+      "delivery_method": "courier",
+      "payment_method": "cash_on_delivery"
+    }
+  }
+}

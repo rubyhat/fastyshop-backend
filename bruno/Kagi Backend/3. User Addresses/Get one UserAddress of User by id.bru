@@ -1,0 +1,15 @@
+meta {
+  name: Get one UserAddress of User by id
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{URL}}/user_addresses/e0f1fada-eb8b-4522-9b81-5962c26d9358
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

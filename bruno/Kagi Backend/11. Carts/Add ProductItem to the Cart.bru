@@ -1,0 +1,24 @@
+meta {
+  name: Add ProductItem to the Cart
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{URL}}/carts/0eb0be15-1729-4f1e-ba9e-7416503f39d3/add
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "cart": {
+      "product_id": "49ef708e-af7d-4ef4-9e0a-4a82a6cca3ee",
+      "quantity": 1
+    }
+  }
+}

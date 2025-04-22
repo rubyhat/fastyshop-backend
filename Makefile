@@ -124,3 +124,8 @@ clean-prod:
 ## 🐛 Логи продакшн-контейнеров
 logs-prod:
 	docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file $(ENV_FILE_PROD) logs -ft
+
+## 🐛 Логи бекенд контейнера
+logs-backend:
+	docker logs -f fastyshop-backend
+

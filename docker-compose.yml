@@ -31,6 +31,11 @@ services:
       RAILS_ENV: ${RAILS_ENV:-development}
       # Указываем режим запуска (development или production)
       # Значение можно переопределить при запуске через переменную окружения RAILS_ENV
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/status" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
   # 🐘 База данных PostgreSQL
   db:

@@ -6,7 +6,7 @@ services:
         TARGET_PLATFORM: ${TARGET_PLATFORM:-linux/arm64}
     volumes:
       - ./swagger:/app/swagger
-    container_name: kagi-backend-test
+    container_name: fastyshop-backend-test
     command: [ "sleep", "infinity" ]
     env_file:
       - .env.test

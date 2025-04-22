@@ -27,29 +27,29 @@ puts "👑 Создаём пользователей по ролям..."
 users = [
   {
     phone: "77000000001",
-    email: "superadmin@kagi.local",
-    password: "Superadmin1@",
+    email: "superadmin@fastyshop.local",
+    password: "UserPassword1@",
     role: :superadmin,
     country_code: "KZ"
   },
   {
     phone: "77000000002",
-    email: "supermanager@kagi.local",
-    password: "Supermanager1@",
+    email: "supermanager@fastyshop.local",
+    password: "UserPassword1@",
     role: :supermanager,
     country_code: "KZ"
   },
   {
     phone: "77000000003",
-    email: "seller@kagi.local",
-    password: "Selleruser1@",
+    email: "seller@fastyshop.local",
+    password: "UserPassword1@",
     role: :seller,
     country_code: "RU"
   },
   {
     phone: "77000000004",
-    email: "user@kagi.local",
-    password: "Regularuser1@",
+    email: "user@fastyshop.local",
+    password: "UserPassword1@",
     role: :user,
     country_code: "RU"
   }

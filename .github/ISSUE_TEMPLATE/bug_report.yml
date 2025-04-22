@@ -1,5 +1,5 @@
 name: 🐞 Bug report
-description: Сообщи об ошибке в kagi-backend
+description: Сообщи об ошибке в fastyshop-backend
 title: "[BUG] <краткое описание>"
 labels: [bug]
 assignees:

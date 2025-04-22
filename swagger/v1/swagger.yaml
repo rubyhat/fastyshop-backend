@@ -1,7 +1,7 @@
 ---
 openapi: 3.0.1
 info:
-  title: Kagi Backend API
+  title: Fastyshop Backend API
   version: v1
 components:
   securitySchemes:

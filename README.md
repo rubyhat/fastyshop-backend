@@ -1,6 +1,6 @@
-# 🧠 Kagi Backend (Rails API-only)
+# 🧠 Fastyshop Backend (Rails API-only)
 
-Это backend-часть проекта **Kagi** — SaaS-платформа для создания интернет-магазинов с акцентом на mobile-first, модульную архитектуру и безопасность.
+Это backend-часть проекта **Fastyshop** — SaaS-платформа для создания интернет-магазинов с акцентом на mobile-first, модульную архитектуру и безопасность.
 
 ---
 
@@ -31,8 +31,8 @@
 ### 2. 📥 Склонируй репозиторий
 
 ```bash
-git clone https://github.com/your-username/kagi-backend.git
-cd kagi-backend
+git clone https://github.com/your-username/fastyshop-backend.git
+cd fastyshop-backend
 ```
 
 ### 3. 🛠 Создай файлы окружения
@@ -215,7 +215,7 @@ make db-reset
 ## 📁 Структура проекта (фрагмент)
 
 ```
-kagi-backend/
+fastyshop-backend/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── docker-compose.override.yml

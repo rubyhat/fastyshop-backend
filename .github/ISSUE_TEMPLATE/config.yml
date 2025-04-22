@@ -3,7 +3,7 @@ contact_links: []
 
 issue_templates:
   - name: 🐞 Bug report
-    description: Сообщи об ошибке в kagi-backend
+    description: Сообщи об ошибке в fastyshop-backend
     labels: [bug]
     file: bug_report.yml
 

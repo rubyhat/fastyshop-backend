@@ -21,6 +21,6 @@ jobs:
             echo "🛠 Начинаем деплой fastyshop-backend..."
             cd ~/apps/fastyshop-backend
             git pull origin main
-            docker compose --env-file .env.development down
-            docker compose --env-file .env.development up --build -d
+            docker compose --env-file .env.production down
+            docker compose --env-file .env.production up --build -d
             echo "✅ Деплой завершён"

@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "name": "Kagi Backend",
+  "name": "Fastyshop Backend",
   "type": "collection",
   "ignore": [
     "node_modules",

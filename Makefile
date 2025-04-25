@@ -129,3 +129,16 @@ logs-prod:
 logs-backend:
 	docker logs -f fastyshop-backend
 
+## 🔧 Создание БД, миграции и сиды (db:prepare)
+db-prepare-prod:
+	docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file $(ENV_FILE_PROD) exec web bin/rails db:prepare
+
+## 🌱 Заполнить тестовыми данными из seeds.rb (db:seed)
+db-seed-prod:
+	docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.production exec web bin/rails db:seed
+
+# Запуск консоли в контейнере продакшена
+rails-c-prod:
+	docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.production exec web bin/rails console
+
+

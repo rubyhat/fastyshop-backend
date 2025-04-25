@@ -9,6 +9,7 @@ gem "puma", ">= 5.0"
 gem "bcrypt", "~> 3.1", ">= 3.1.20"
 gem "bootsnap", require: false
 gem "tzinfo-data", platforms: %i[windows jruby]
+gem "rack-cors", require: "rack/cors"
 
 # 🧠 Background Jobs & Caching
 gem "sidekiq", "~> 8.0"

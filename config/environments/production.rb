@@ -77,7 +77,7 @@ Rails.application.configure do
   config.active_record.attributes_for_inspect = [ :id ]
 
   # Enable DNS rebinding protection and other `Host` header attacks.
-  config.hosts = %w[api.fastyshop.kz]
+  config.hosts = %w[api.fastyshop.kz localhost 127.0.0.1g]
   # config.hosts = [
   # "api.fastyshop.kz",     # Allow requests from example.com
   # /.*\.fastyshop\.kz/ # Allow requests from subdomains like `www.fastyshop.kz`

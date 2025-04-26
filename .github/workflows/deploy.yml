@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: 📥 Checkout репозитория
+        uses: actions/checkout@v3
+
       - name: Connect and Deploy over SSH
         uses: appleboy/ssh-action@master
         with:
@@ -21,6 +24,5 @@ jobs:
             echo "🛠 Начинаем деплой fastyshop-backend..."
             cd ~/apps/fastyshop-backend
             git pull origin main
-#            make clean-prod
             make up-prod
             echo "✅ Деплой завершён"

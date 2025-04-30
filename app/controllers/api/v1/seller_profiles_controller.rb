@@ -37,26 +37,35 @@ module Api
       end
 
       # POST /api/v1/seller_profiles
+      # POST /api/v1/seller_profiles
       def create
         user = current_user
 
-        return render_error(
-          key: "seller_profiles.already_exists",
-          message: "Профиль уже существует",
-          status: :unprocessable_entity,
-          code: 422
-        ) if user && user.seller_profile.present?
+        return render_unauthorized unless user
 
-        if user
+        if user.seller_profile.present?
+          return render_error(
+            key: "seller_profiles.already_exists",
+            message: "Профиль уже существует",
+            status: :unprocessable_entity,
+            code: 422
+          )
+        end
+
+        ActiveRecord::Base.transaction do
           profile = user.build_seller_profile(seller_profile_params)
 
           if profile.save
+            user.update!(role: :seller)
             render json: profile, status: :created
           else
-            render_validation_errors(profile)
+            raise ActiveRecord::Rollback
           end
         end
+      rescue ActiveRecord::RecordInvalid => e
+        render_validation_errors(e.record)
       end
+
 
       # PATCH /api/v1/seller_profiles/:id
       def update

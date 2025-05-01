@@ -1,5 +1,5 @@
 class UserSerializer < ActiveModel::Serializer
-  attributes :id, :phone, :role, :country_code, :is_active
+  attributes :id, :phone, :role, :country_code, :is_active, :first_name, :last_name, :middle_name
 
   attribute :email, if: :show_email?
 

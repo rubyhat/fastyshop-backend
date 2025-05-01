@@ -1,6 +1,12 @@
 # typed: strict
 # frozen_string_literal: true
 
+# @!attribute [rw] first_name
+#   @return [String] имя пользователя (необязательное)
+# @!attribute [rw] last_name
+#   @return [String] фамилия пользователя (необязательное)
+# @!attribute [rw] middle_name
+#   @return [String, nil] отчество пользователя (необязательное)
 # @!attribute [rw] phone
 #   @return [String] номер телефона пользователя (уникальный)
 # @!attribute [rw] email

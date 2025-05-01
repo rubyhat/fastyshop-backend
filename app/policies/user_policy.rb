@@ -15,7 +15,7 @@ class UserPolicy < ApplicationPolicy
     if user.superadmin? || user.supermanager?
       %i[phone email password password_confirmation country_code role is_active]
     elsif user.id == record.id
-      %i[email password password_confirmation]
+      %i[email password password_confirmation first_name last_name middle_name]
     else
       []
     end

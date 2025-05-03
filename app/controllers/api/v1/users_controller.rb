@@ -29,7 +29,14 @@ module Api
         end
 
         if user.save
-          render json: user, status: :created
+          tokens = JwtService.generate_tokens(user)
+          TokenStorageRedis.save(user_id: user.id, iat: tokens[:iat])
+
+          render json: {
+            user: UserSerializer.new(user, scope: user),
+            access_token: tokens[:access_token],
+            refresh_token: tokens[:refresh_token]
+          }, status: :created
         else
           render_validation_errors(user)
         end

@@ -27,7 +27,8 @@ class JwtService
         iat: iat,
         type: "access",
         role: user.role,
-        name: user_name(user)
+        phone: user.phone,
+        first_name: user.first_name || user_name(user)
       }
 
       refresh_payload = {

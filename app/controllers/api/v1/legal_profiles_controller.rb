@@ -43,11 +43,16 @@ module Api
 
         authorize legal_profile, :create?
 
-        if legal_profile.save
+        ActiveRecord::Base.transaction do
+          legal_profile.save! # если невалидно или дубликат — выбросит ошибку
           render json: legal_profile, status: :created
-        else
-          render_validation_errors(legal_profile)
         end
+
+      rescue ActiveRecord::RecordInvalid => e
+        render_validation_errors(e.record)
+
+      rescue ActiveRecord::RecordNotUnique => e
+        render_record_not_unique(e)
       end
 
       # PATCH /api/v1/legal_profiles/:id

@@ -52,16 +52,17 @@ module Api
           )
         end
 
+        profile = nil
+
         ActiveRecord::Base.transaction do
           profile = user.build_seller_profile(seller_profile_params)
+          profile.save!  # бросит исключение, если невалидно
 
-          if profile.save
-            user.update!(role: :seller)
-            render json: profile, status: :created
-          else
-            raise ActiveRecord::Rollback
-          end
+          user.update!(role: :seller)
         end
+
+        render json: profile, status: :created
+
       rescue ActiveRecord::RecordInvalid => e
         render_validation_errors(e.record)
       end

@@ -10,6 +10,19 @@ module Api
 
       rescue_from Pundit::NotAuthorizedError, with: :render_forbidden_custom
 
+      # Базовая обработка ошибок 500+ todo: надо протестить
+      rescue_from StandardError do |exception|
+        logger.error "[#{exception.class}] #{exception.message}"
+        logger.error exception.backtrace.join("\n") if Rails.env.development? || Rails.env.test?
+
+        render json: {
+          status: 500,
+          error: "Internal Server Error",
+          message: exception.message,
+          class: exception.class.name
+        }, status: :internal_server_error
+      end
+
 
       before_action :authenticate_user!
       before_action { Current.user = current_user }

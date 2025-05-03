@@ -109,6 +109,10 @@ routes:
 # 🚀 PRODUCTION
 # ========================
 
+## 📦 Применить миграции в продакшене
+db-migrate-prod:
+	docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file $(ENV_FILE_PROD) exec web bin/rails db:migrate
+
 ## 🛠 Сборка production-образа без запуска контейнеров
 build-prod:
 	docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file $(ENV_FILE_PROD) build

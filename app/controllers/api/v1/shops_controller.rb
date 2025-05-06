@@ -6,6 +6,8 @@ module Api
       # GET /api/v1/shops
       # Панель продавца: отображает ВСЕ его магазины
       def index
+        # todo: Подумать, нужно ли сделать запрос завязанный на user id, чтобы другие пользователи могли бы смотреть все магазины этого пользователя.
+        # Чтобы админ мог заходить к пользователю и видеть все магазины? Или это вынести в админку?
         shops = ShopPolicy::Scope.new(current_user, Shop).resolve_owner_view
         authorize Shop
         render json: shops, status: :ok

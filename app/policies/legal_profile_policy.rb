@@ -35,7 +35,6 @@ class LegalProfilePolicy < ApplicationPolicy
   private
 
   def owns_seller_profile?
-    record.respond_to?(:seller_profile) &&
-      record.seller_profile&.user_id == user.id
+    user&.seller_profile.present?
   end
 end

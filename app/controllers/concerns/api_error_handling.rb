@@ -15,12 +15,25 @@ module ApiErrorHandling
     rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
     rescue_from JWT::DecodeError, with: :render_invalid_token
     rescue_from JWT::ExpiredSignature, with: :render_expired_token
-    rescue_from Pundit::NotAuthorizedError, with: :render_forbidden if defined?(Pundit)
     rescue_from ActiveRecord::RecordNotUnique, with: :render_record_not_unique
+
+    # Базовая обработка ошибок 500+ todo: надо протестить
+    rescue_from StandardError do |exception|
+      logger.error "[#{exception.class}] #{exception.message}"
+      logger.error exception.backtrace.join("\n") if Rails.env.development? || Rails.env.test?
+
+      render json: {
+        status: 500,
+        error: "Internal Server Error",
+        message: exception.message,
+        class: exception.class.name
+      }, status: :internal_server_error
+    end
   end
 
   private
 
+  # Обработка уникальности на уровне базы (например, индекс tax_id)
   def render_record_not_unique(exception = nil)
     constraint = extract_constraint_from_exception(exception)
     message = friendly_message_for_constraint(constraint)
@@ -58,14 +71,17 @@ module ApiErrorHandling
 
 
 
-  def render_unauthorized(message = "Unauthorized", key = "auth.unauthorized")
+  # Обработка ошибки Pundit::NotAuthorizedError
+  def render_unauthorized(message = "Необходимо войти в аккаунт", key = "auth.unauthorized")
     render_error(key: key, message: message, status: :unauthorized, code: 401)
   end
 
-  def render_not_found(message = "Resource not found", key = "common.not_found")
+  # Ресурс не найден
+  def render_not_found(message = "Ресурс не найден", key = "common.not_found")
     render_error(key: key, message: message, status: :not_found, code: 404)
   end
 
+  # Невалидный JWT токен
   def render_invalid_token
     render_error(
       key: "auth.invalid_token",
@@ -75,6 +91,7 @@ module ApiErrorHandling
     )
   end
 
+  # Истёкший JWT токен
   def render_expired_token
     render_error(
       key: "auth.token_expired",
@@ -84,10 +101,46 @@ module ApiErrorHandling
     )
   end
 
+  def render_pundit_forbidden(exception)
+    query_name = exception.query.to_s
+    record_class = exception.record.is_a?(Class) ? exception.record : exception.record.class
+    record_name = record_class.name.demodulize.underscore
+
+    # todo: текст ошибок временный, в будущем отправлять ключи, а на фронте отображать ошибки на нужных языках
+    # Карта действий → человекочитаемые фразы
+    query_map = {
+      "index?" => "просмотр списка",
+      "show?" => "просмотр",
+      "create?" => "создание",
+      "update?" => "редактирование",
+      "destroy?" => "удаление",
+      "unverify?" => "отключение верификации"
+    }
+
+    # Карта моделей → человекочитаемые ресурсы
+    record_map = {
+      "legal_profile" => "юридическим профилям",
+      "seller_profile" => "профилю продавца",
+      "shop" => "магазину",
+      "user" => "пользователю",
+      "product" => "товару",
+      "order" => "заказу"
+    }
+
+    action_text = query_map.fetch(query_name, "действию")
+    resource_text = record_map.fetch(record_name, "ресурсу")
+
+    message = "Нет прав на #{action_text} #{resource_text}"
+
+    render_forbidden(message: message, key: "auth.pundit.forbidden")
+  end
+
+  # Ошибка авторизации (доступ запрещён)
   def render_forbidden(message: "Access denied", key: "auth.forbidden")
     render_error(key: key, message: message, status: :forbidden, code: 403)
   end
 
+  # Пользователь ранее удалён (is_active: false)
   def render_user_deleted
     render json: {
       error: {
@@ -99,6 +152,7 @@ module ApiErrorHandling
     }, status: :gone
   end
 
+  # Универсальная точка возврата ошибок
   def render_error(key:, message:, status:, code:)
     render json: {
       error: {
@@ -110,6 +164,7 @@ module ApiErrorHandling
     }, status: status
   end
 
+  # Универсальный успех
   def render_success(key:, message:, code: 200)
     render json: {
       success: {
@@ -121,7 +176,7 @@ module ApiErrorHandling
     }, status: :ok
   end
 
-
+  # Ошибки валидации ActiveModel/ActiveRecord
   def render_validation_errors(resource)
     render json: {
       error: {

@@ -8,32 +8,13 @@ module Api
       include ApiErrorHandling
       include Pundit::Authorization
 
-      rescue_from Pundit::NotAuthorizedError, with: :render_forbidden_custom
-
-      # Базовая обработка ошибок 500+ todo: надо протестить
-      rescue_from StandardError do |exception|
-        logger.error "[#{exception.class}] #{exception.message}"
-        logger.error exception.backtrace.join("\n") if Rails.env.development? || Rails.env.test?
-
-        render json: {
-          status: 500,
-          error: "Internal Server Error",
-          message: exception.message,
-          class: exception.class.name
-        }, status: :internal_server_error
-      end
-
+      rescue_from Pundit::NotAuthorizedError, with: :render_pundit_forbidden
 
       before_action :authenticate_user!
       before_action { Current.user = current_user }
 
 
       private
-
-      def render_forbidden_custom
-        render_forbidden(message: "Доступ запрещен.", key: "base.forbidden")
-      end
-
 
       # Аутентификация пользователя по access-токену
       def authenticate_user!

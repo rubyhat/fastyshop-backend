@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "pp"
-
 module Api
   module V1
     class BaseController < ApplicationController
@@ -27,11 +25,7 @@ module Api
       def current_user
         @current_user ||= begin
                             token = request.headers["Authorization"]&.split&.last
-                            pp "JWT TOKEN"
-                            pp token
                             payload = JwtService.decode_and_verify(token && token)
-                            pp "JWT PAYLOAD"
-                            pp payload
                             if payload.present? && payload["type"] == "access"
                               User.find_by(id: payload["sub"])
                             else

@@ -6,12 +6,12 @@
 
 ## 📦 Используемый стек
 
-- **Ruby** 3.4.2
-- **Rails** 8.0.2 (API-only)
+- **Ruby** 4.0.2
+- **Rails** 8.1.3 (API-only)
 - **PostgreSQL** 17
 - **Redis** 7.4
 - **Docker** + Docker Compose
-- **Bundler**, **Yarn**
+- **Bundler**
 - **Makefile** для упрощения dev/prod команд
 
 ---

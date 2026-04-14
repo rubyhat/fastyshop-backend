@@ -2,8 +2,10 @@
 
 source "https://rubygems.org"
 
+ruby "4.0.2"
+
 # 🌱 Core Rails stack
-gem "rails", "~> 8.0.2"
+gem "rails", "~> 8.1.3"
 gem "pg", "~> 1.1"
 gem "puma", ">= 5.0"
 gem "bcrypt", "~> 3.1", ">= 3.1.20"
@@ -43,12 +45,12 @@ gem "thruster", require: false
 
 group :development, :test do
   # 🧪 Testing
-  gem "factory_bot_rails", "~> 6.4", ">= 6.4.4"
+  gem "factory_bot_rails", "~> 6.5"
   gem "faker", "~> 3.5", ">= 3.5.1"
-  gem "rspec-rails", "~> 7.1", ">= 7.1.1"
-  gem "rswag", "~> 2.16"
-  gem "rswag-ui", "~> 2.16"
-  gem "rswag-api", "~> 2.16"
+  gem "rspec-rails", "~> 8.0"
+  gem "rswag", "~> 2.17"
+  gem "rswag-ui", "~> 2.17"
+  gem "rswag-api", "~> 2.17"
 
   # 🐞 Debugging & Static analysis
   gem "brakeman", require: false

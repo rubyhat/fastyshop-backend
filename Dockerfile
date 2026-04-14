@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Используем Ruby образ. Версия задается через аргумент
-ARG RUBY_VERSION=3.4.2
+ARG RUBY_VERSION=4.0.2
 ARG TARGET_PLATFORM
 FROM --platform=$TARGET_PLATFORM ruby:$RUBY_VERSION-slim AS base
 
@@ -23,8 +23,6 @@ RUN apt-get update -qq && \
     libyaml-dev \
     git \
     curl \
-    nodejs \
-    yarn \
     postgresql-client && \
     rm -rf /var/lib/apt/lists/*
 

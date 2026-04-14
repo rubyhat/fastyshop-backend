@@ -30,6 +30,7 @@ users = [
     email: "superadmin@fastyshop.local",
     password: "UserPassword1@",
     role: :superadmin,
+    account_status: :approved,
     country_code: "KZ"
   },
   {
@@ -37,6 +38,7 @@ users = [
     email: "supermanager@fastyshop.local",
     password: "UserPassword1@",
     role: :supermanager,
+    account_status: :approved,
     country_code: "KZ"
   },
   {
@@ -44,6 +46,7 @@ users = [
     email: "seller@fastyshop.local",
     password: "UserPassword1@",
     role: :seller,
+    account_status: :approved,
     country_code: "RU"
   },
   {
@@ -51,6 +54,7 @@ users = [
     email: "user@fastyshop.local",
     password: "UserPassword1@",
     role: :user,
+    account_status: :approved,
     country_code: "RU"
   }
 ]
@@ -61,8 +65,8 @@ users.each do |attrs|
     user.password = attrs[:password]
     user.password_confirmation = attrs[:password]
     user.role = attrs[:role]
+    user.account_status = attrs[:account_status]
     user.country_code = attrs[:country_code]
-    user.is_active = true
   end
 end
 

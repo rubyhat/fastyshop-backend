@@ -4,16 +4,20 @@ class UserPolicy < ApplicationPolicy
   end
 
   def create?
-    true
+    user.superadmin? || user.supermanager?
   end
 
   def update?
     user.superadmin? || user.supermanager? || user.id == record.id
   end
 
+  def update_account_status?
+    user.superadmin? || user.supermanager?
+  end
+
   def permitted_update_params
     if user.superadmin? || user.supermanager?
-      %i[phone email password password_confirmation country_code role is_active]
+      %i[email password password_confirmation first_name last_name middle_name]
     elsif user.id == record.id
       %i[email password password_confirmation first_name last_name middle_name]
     else
@@ -26,7 +30,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def show?
-    true
+    user.superadmin? || user.supermanager? || user.id == record.id
   end
 
   def destroy?

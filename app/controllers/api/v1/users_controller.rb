@@ -3,8 +3,6 @@
 module Api
   module V1
     class UsersController < BaseController
-      skip_before_action :authenticate_user!, only: %i[create show]
-
       # GET /api/v1/me
       #
       # Возвращает текущего авторизованного пользователя.
@@ -12,31 +10,18 @@ module Api
       def me
         authorize current_user, :me?
 
-        render json: current_user, status: :ok
+        render json: current_user, scope: current_user, status: :ok
       end
 
 
       # POST /api/v1/users
       def create
-        user = User.new(user_params)
+        authorize User, :create?
 
-        # Принудительно назначаем роль user, игнорируем любую переданную
-        user.role = 3
+        user = Users::CreateAccount.for_admin(admin_user_params)
 
-        # Запрет на создание superadmin
-        if user.superadmin?
-          return render_forbidden(message: "Создание superadmin запрещено", key: "users.superadmin_not_allowed")
-        end
-
-        if user.save
-          tokens = JwtService.generate_tokens(user)
-          TokenStorageRedis.save(user_id: user.id, iat: tokens[:iat])
-
-          render json: {
-            user: UserSerializer.new(user, scope: user),
-            access_token: tokens[:access_token],
-            refresh_token: tokens[:refresh_token]
-          }, status: :created
+        if user.persisted?
+          render json: user, scope: current_user, status: :created
         else
           render_validation_errors(user)
         end
@@ -50,7 +35,28 @@ module Api
         authorize user, :update?
 
         if user.update(permitted_params(user))
-          render json: user, status: :ok
+          render json: user, scope: current_user, status: :ok
+        else
+          render_validation_errors(user)
+        end
+      end
+
+      # PATCH /api/v1/users/:id/account_status
+      def update_account_status
+        user = User.find_by(id: params[:id])
+        return render_not_found unless user
+
+        authorize user, :update_account_status?
+
+        status = account_status_params[:account_status].to_s
+
+        unless User.account_statuses.key?(status)
+          user.errors.add(:account_status, "недопустимый статус аккаунта")
+          return render_validation_errors(user)
+        end
+
+        if user.update(account_status: status)
+          render json: user, scope: current_user, status: :ok
         else
           render_validation_errors(user)
         end
@@ -61,12 +67,12 @@ module Api
         user = User.find_by(id: params[:id])
         return render_not_found unless user
 
-        unless user.is_active
+        if user.deactivated?
           return render_user_deleted
         end
 
         authorize user, :show?
-        render json: user, status: :ok
+        render json: user, scope: current_user, status: :ok
       end
 
       # DELETE /api/v1/users/:id
@@ -74,7 +80,7 @@ module Api
         user = User.find_by(id: params[:id])
         return render_not_found unless user
 
-        unless user.is_active
+        if user.deactivated?
           return render_error(
             key: "user.delete_deleted_user",
             message: "Пользователь уже был удалён ранее",
@@ -86,7 +92,9 @@ module Api
 
         authorize user, :destroy?
 
-        if user.update(is_active: false)
+        if user.update(account_status: :deactivated)
+          TokenStorageRedis.clear_all(user_id: user.id)
+
           render_success(
             key: "users.deleted",
             message: "Пользователь успешно удалён (деактивирован)",
@@ -100,13 +108,28 @@ module Api
       # GET /api/v1/users
       def index
         users = policy_scope(User)
-        render json: users, status: :ok
+        render json: users, scope: current_user, status: :ok
       end
 
       private
 
-      def user_params
-        params.require(:user).permit(:phone, :email, :password, :password_confirmation, :country_code, :first_name, :last_name, :middle_name)
+      def admin_user_params
+        params.require(:user).permit(
+          :phone,
+          :email,
+          :password,
+          :password_confirmation,
+          :country_code,
+          :role,
+          :account_status,
+          :first_name,
+          :last_name,
+          :middle_name
+        )
+      end
+
+      def account_status_params
+        params.permit(:account_status)
       end
 
       def permitted_params(user)

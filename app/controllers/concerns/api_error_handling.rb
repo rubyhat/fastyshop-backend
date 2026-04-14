@@ -60,7 +60,7 @@ module ApiErrorHandling
     case constraint
     when "index_legal_profiles_on_tax_id"
       "Такой налоговый номер уже используется"
-    when "index_users_on_email"
+    when "index_users_on_email", "index_users_on_lower_email"
       "Этот email уже зарегистрирован"
     when "index_users_on_phone"
       "Этот номер телефона уже используется"
@@ -140,7 +140,7 @@ module ApiErrorHandling
     render_error(key: key, message: message, status: :forbidden, code: 403)
   end
 
-  # Пользователь ранее удалён (is_active: false)
+  # Пользователь ранее удалён (account_status: deactivated)
   def render_user_deleted
     render json: {
       error: {

@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "Api::V1::Shops", type: :request do
   # let(:password) { "Password@123!" }
   # let(:user) { create(:user, role: :seller, password: password, password_confirmation: password) }
-  let(:user) { create(:user) }
+  let(:user) { create(:user, role: :seller) }
 
   describe "POST /api/v1/shops" do
     context "с валидными параметрами" do

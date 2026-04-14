@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       # Аутентификация
+      post "auth/signup",  to: "auth#signup"
       post "auth/login",   to: "auth#login"
       post "auth/refresh", to: "auth#refresh"
       post "auth/logout",  to: "auth#logout"
@@ -20,6 +21,10 @@ Rails.application.routes.draw do
 
       # Пользователи
       resources :users, only: %i[create update show destroy index] do
+        member do
+          patch :account_status, to: "users#update_account_status"
+        end
+
         get :seller_profile, to: "seller_profiles#show_by_user"
       end
 

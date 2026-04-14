@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "securerandom"
+
 # JwtService — генерация и валидация JWT access и refresh токенов.
 #
 # Использует алгоритм HS256 с секретным ключом из ENV["JWT_SECRET_KEY"].
@@ -16,32 +18,34 @@ class JwtService
     # Генерирует пару access и refresh токенов
     #
     # @param user [User]
+    # @param session_id [String, nil]
     # @return [Hash] access_token, refresh_token
-    def generate_tokens(user)
+    def generate_tokens(user, session_id: nil)
       now = Time.current
       iat = now.to_i
+      sid = session_id.presence || SecureRandom.uuid
 
       access_payload = {
         sub: user.id,
         exp: (now + JwtConfig.access_token_ttl).to_i,
         iat: iat,
         type: "access",
-        role: user.role,
-        phone: user.phone,
-        first_name: user.first_name || user_name(user)
+        sid: sid
       }
 
       refresh_payload = {
         sub: user.id,
         exp: (now + JwtConfig.refresh_token_ttl).to_i,
         iat: iat,
-        type: "refresh"
+        type: "refresh",
+        sid: sid
       }
 
       {
         access_token: JWT.encode(access_payload, JwtConfig.secret_key, "HS256"),
         refresh_token: JWT.encode(refresh_payload, JwtConfig.secret_key, "HS256"),
-        iat: iat
+        iat: iat,
+        session_id: sid
       }
     end
 
@@ -64,11 +68,6 @@ class JwtService
       JWT.decode(token, JwtConfig.secret_key, true, { algorithm: "HS256" }).first.with_indifferent_access
     rescue JWT::DecodeError, JWT::ExpiredSignature
       nil
-    end
-
-    private
-    def user_name(user)
-      user.respond_to?(:name) ? user.name : "#{user.role}_#{user.id.to_s.first(6)}"
     end
   end
 end

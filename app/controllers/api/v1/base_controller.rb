@@ -25,9 +25,10 @@ module Api
       def current_user
         @current_user ||= begin
                             token = request.headers["Authorization"]&.split&.last
-                            payload = JwtService.decode_and_verify(token && token)
+                            payload = JwtService.decode_and_verify(token)
                             if payload.present? && payload["type"] == "access"
-                              User.find_by(id: payload["sub"])
+                              user = User.find_by(id: payload["sub"])
+                              user if user&.authenticatable?
                             else
                               nil
                             end

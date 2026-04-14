@@ -7,4 +7,11 @@ RSpec.describe "Health", type: :request do
       expect(response).to have_http_status(:ok)
     end
   end
+
+  describe "GET /up" do
+    it "возвращает 200 OK" do
+      get "/up"
+      expect(response).to have_http_status(:ok)
+    end
+  end
 end

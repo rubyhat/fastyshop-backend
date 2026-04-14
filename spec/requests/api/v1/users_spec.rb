@@ -22,5 +22,30 @@ RSpec.describe "Api::V1::Users", type: :request do
         expect(json_body["error"]).to be_present
       end
     end
+
+    context "когда передан невалидный токен" do
+      it "возвращает 401" do
+        get "/api/v1/me", headers: { "Authorization" => "Bearer invalid.token.value" }
+
+        expect(response).to have_http_status(:unauthorized)
+        expect(json_body.dig("error", "key")).to eq("auth.unauthorized")
+      end
+    end
+  end
+
+  describe "PATCH /api/v1/users/:id" do
+    let(:user) { create(:user, role: :user) }
+    let(:other_user) { create(:user, role: :user) }
+
+    context "когда пользователь пытается обновить чужой профиль" do
+      it "возвращает 403" do
+        patch "/api/v1/users/#{other_user.id}", headers: auth_headers(user), params: {
+          first_name: "Forbidden"
+        }
+
+        expect(response).to have_http_status(:forbidden)
+        expect(json_body.dig("error", "key")).to eq("auth.pundit.forbidden")
+      end
+    end
   end
 end

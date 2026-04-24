@@ -13,6 +13,12 @@ class SellerProfile < ApplicationRecord
   validates :slug, presence: true, uniqueness: true, length: { maximum: 100 }
   validates :description, length: { maximum: 1000 }, allow_blank: true
   validates :logo_url, length: { maximum: 255 }, allow_blank: true
+  validate :validate_slug_immutable, on: :update
+
+  # @return [Boolean]
+  def owns_shop_contact_data?
+    false
+  end
 
   def generate_slug
     return if slug.present? && slug_changed? # не перезаписывать вручную заданный
@@ -27,5 +33,11 @@ class SellerProfile < ApplicationRecord
     end
 
     self.slug = candidate
+  end
+
+  private
+
+  def validate_slug_immutable
+    errors.add(:slug, "нельзя изменить после создания") if will_save_change_to_slug?
   end
 end

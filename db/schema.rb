@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_14_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_24_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -27,14 +27,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_120000) do
   end
 
   create_table "carts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "converted_at"
     t.datetime "created_at", null: false
     t.datetime "expired_at"
     t.uuid "shop_id", null: false
+    t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
     t.uuid "user_id", null: false
     t.index ["shop_id"], name: "index_carts_on_shop_id"
-    t.index ["user_id", "shop_id"], name: "index_carts_on_user_id_and_shop_id", unique: true
+    t.index ["user_id", "shop_id", "status"], name: "index_carts_on_user_id_and_shop_id_and_status"
+    t.index ["user_id", "shop_id"], name: "idx_unique_active_carts_on_user_shop", unique: true, where: "(status = 0)"
     t.index ["user_id"], name: "index_carts_on_user_id"
+  end
+
+  create_table "catalog_lifecycle_events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "actor_user_id"
+    t.datetime "created_at", null: false
+    t.integer "event_type", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "record_id", null: false
+    t.string "record_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_user_id"], name: "index_catalog_lifecycle_events_on_actor_user_id"
+    t.index ["event_type"], name: "index_catalog_lifecycle_events_on_event_type"
+    t.index ["record_type", "record_id", "created_at"], name: "idx_catalog_lifecycle_events_on_record_created"
   end
 
   create_table "countries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -46,18 +62,52 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_120000) do
     t.index ["code"], name: "index_countries_on_code", unique: true
   end
 
+  create_table "legal_profile_verification_events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "actor_user_id"
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.integer "event_type", null: false
+    t.string "from_status"
+    t.uuid "legal_profile_id", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.string "to_status"
+    t.datetime "updated_at", null: false
+    t.index ["actor_user_id"], name: "index_legal_profile_verification_events_on_actor_user_id"
+    t.index ["legal_profile_id", "created_at"], name: "idx_lp_verif_events_on_profile_created"
+    t.index ["legal_profile_id"], name: "index_legal_profile_verification_events_on_legal_profile_id"
+  end
+
   create_table "legal_profiles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "company_name", null: false
     t.string "country_code", null: false
     t.datetime "created_at", null: false
-    t.boolean "is_verified", default: false
     t.string "legal_address", null: false
-    t.string "legal_form", null: false
+    t.string "legal_form_code", null: false
+    t.string "legal_name", null: false
+    t.text "moderation_comment"
+    t.string "registration_number", null: false
+    t.string "registration_number_type", null: false
     t.uuid "seller_profile_id", null: false
-    t.string "tax_id", null: false
     t.datetime "updated_at", null: false
+    t.integer "verification_status", default: 0, null: false
+    t.index ["country_code", "registration_number_type", "registration_number"], name: "index_legal_profiles_on_country_type_and_registration_number", unique: true
     t.index ["seller_profile_id"], name: "index_legal_profiles_on_seller_profile_id"
-    t.index ["tax_id"], name: "index_legal_profiles_on_tax_id", unique: true
+    t.index ["verification_status"], name: "index_legal_profiles_on_verification_status"
+  end
+
+  create_table "order_events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "actor_user_id"
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.integer "event_type", null: false
+    t.string "from_status"
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "order_id", null: false
+    t.string "to_status"
+    t.datetime "updated_at", null: false
+    t.index ["actor_user_id"], name: "index_order_events_on_actor_user_id"
+    t.index ["event_type"], name: "index_order_events_on_event_type"
+    t.index ["order_id", "created_at"], name: "index_order_events_on_order_id_and_created_at"
+    t.index ["order_id"], name: "index_order_events_on_order_id"
   end
 
   create_table "order_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -65,6 +115,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_120000) do
     t.uuid "order_id", null: false
     t.decimal "price", precision: 10, scale: 2, null: false
     t.uuid "product_id", null: false
+    t.jsonb "product_snapshot", default: {}, null: false
     t.integer "quantity", null: false
     t.datetime "updated_at", null: false
     t.index ["order_id", "product_id"], name: "index_order_items_on_order_id_and_product_id", unique: true
@@ -73,42 +124,51 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_120000) do
   end
 
   create_table "orders", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.boolean "canceled_by_user", default: false
-    t.string "contact_name", null: false
-    t.string "contact_phone", null: false
+    t.string "checkout_idempotency_key"
     t.datetime "created_at", null: false
-    t.string "delivery_address_text", null: false
-    t.string "delivery_comment"
-    t.integer "delivery_method", null: false
-    t.integer "payment_method", null: false
+    t.text "customer_comment"
+    t.jsonb "customer_snapshot", default: {}, null: false
+    t.datetime "inventory_restored_at"
+    t.jsonb "legal_profile_snapshot", default: {}, null: false
+    t.integer "order_number", null: false
     t.uuid "shop_id", null: false
+    t.jsonb "shop_snapshot", default: {}, null: false
     t.integer "status", default: 0, null: false
-    t.string "status_comment"
     t.decimal "total_price", precision: 10, scale: 2, null: false
     t.datetime "updated_at", null: false
     t.uuid "user_id", null: false
     t.index ["created_at"], name: "index_orders_on_created_at"
+    t.index ["shop_id", "order_number"], name: "index_orders_on_shop_id_and_order_number", unique: true
     t.index ["shop_id", "status"], name: "index_orders_on_shop_id_and_status"
     t.index ["shop_id"], name: "index_orders_on_shop_id"
     t.index ["status"], name: "index_orders_on_status"
+    t.index ["user_id", "shop_id", "checkout_idempotency_key"], name: "idx_orders_on_user_shop_checkout_key", unique: true, where: "(checkout_idempotency_key IS NOT NULL)"
     t.index ["user_id", "status"], name: "index_orders_on_user_id_and_status"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
   create_table "product_categories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "archived_at"
+    t.uuid "archived_by_id"
     t.datetime "created_at", null: false
-    t.boolean "is_active", default: true, null: false
     t.integer "level", default: 0, null: false
     t.uuid "parent_id"
     t.integer "position", default: 0, null: false
+    t.datetime "published_at"
+    t.uuid "published_by_id"
     t.uuid "shop_id", null: false
     t.string "slug", null: false
+    t.integer "status", default: 0, null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
-    t.index ["is_active"], name: "index_product_categories_on_is_active"
+    t.index ["archived_by_id"], name: "index_product_categories_on_archived_by_id"
     t.index ["level"], name: "index_product_categories_on_level"
+    t.index ["parent_id", "status"], name: "index_product_categories_on_parent_id_and_status"
     t.index ["parent_id"], name: "index_product_categories_on_parent_id"
     t.index ["position"], name: "index_product_categories_on_position"
+    t.index ["published_by_id"], name: "index_product_categories_on_published_by_id"
+    t.index ["shop_id", "parent_id", "position"], name: "idx_product_categories_on_shop_parent_position"
+    t.index ["shop_id", "status"], name: "index_product_categories_on_shop_id_and_status"
     t.index ["shop_id"], name: "index_product_categories_on_shop_id"
     t.index ["title"], name: "index_product_categories_on_title"
   end
@@ -137,24 +197,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_120000) do
   end
 
   create_table "products", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "archived_at"
+    t.uuid "archived_by_id"
     t.datetime "created_at", null: false
     t.text "description"
-    t.boolean "is_active", default: true, null: false
+    t.string "image_url"
     t.integer "position", null: false
     t.decimal "price", precision: 10, scale: 2, null: false
     t.uuid "product_category_id"
     t.integer "product_type", null: false
+    t.datetime "published_at"
+    t.uuid "published_by_id"
     t.uuid "shop_id", null: false
+    t.string "sku"
     t.string "slug", null: false
+    t.integer "status", default: 0, null: false
     t.integer "stock_quantity", default: 0, null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
-    t.index ["is_active"], name: "index_products_on_is_active"
+    t.index ["archived_by_id"], name: "index_products_on_archived_by_id"
     t.index ["price"], name: "index_products_on_price"
     t.index ["product_category_id"], name: "index_products_on_product_category_id"
     t.index ["product_type"], name: "index_products_on_product_type"
+    t.index ["published_by_id"], name: "index_products_on_published_by_id"
+    t.index ["shop_id", "product_category_id", "status"], name: "idx_products_on_shop_category_status"
     t.index ["shop_id", "slug"], name: "index_products_on_shop_id_and_slug", unique: true
+    t.index ["shop_id", "status"], name: "index_products_on_shop_id_and_status"
     t.index ["shop_id"], name: "index_products_on_shop_id"
+    t.index ["sku"], name: "index_products_on_sku"
     t.index ["title"], name: "index_products_on_title"
   end
 
@@ -184,25 +254,63 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_120000) do
     t.index ["position"], name: "index_shop_categories_on_position"
   end
 
+  create_table "shop_change_events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "actor_user_id"
+    t.jsonb "changeset", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.integer "event_type", null: false
+    t.uuid "shop_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_user_id"], name: "index_shop_change_events_on_actor_user_id"
+    t.index ["event_type"], name: "index_shop_change_events_on_event_type"
+    t.index ["shop_id", "created_at"], name: "index_shop_change_events_on_shop_id_and_created_at"
+    t.index ["shop_id"], name: "index_shop_change_events_on_shop_id"
+  end
+
+  create_table "shop_slug_histories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.uuid "shop_id", null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["shop_id", "created_at"], name: "index_shop_slug_histories_on_shop_id_and_created_at"
+    t.index ["shop_id"], name: "index_shop_slug_histories_on_shop_id"
+    t.index ["slug"], name: "index_shop_slug_histories_on_slug", unique: true
+  end
+
   create_table "shops", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "contact_email"
     t.string "contact_phone", null: false
     t.datetime "created_at", null: false
-    t.boolean "is_active", default: true, null: false
+    t.text "description"
     t.uuid "legal_profile_id", null: false
+    t.string "logo_url"
+    t.integer "orders_counter", default: 0, null: false
     t.string "physical_address"
     t.uuid "seller_profile_id", null: false
     t.uuid "shop_category_id", null: false
     t.integer "shop_type", null: false
     t.string "slug", null: false
+    t.integer "status", default: 0, null: false
+    t.text "status_comment"
     t.string "title", null: false
     t.datetime "updated_at", null: false
-    t.index ["is_active"], name: "index_shops_on_is_active"
     t.index ["legal_profile_id"], name: "index_shops_on_legal_profile_id"
     t.index ["seller_profile_id"], name: "index_shops_on_seller_profile_id"
     t.index ["shop_category_id"], name: "index_shops_on_shop_category_id"
     t.index ["shop_type"], name: "index_shops_on_shop_type"
     t.index ["slug"], name: "index_shops_on_slug", unique: true
+    t.index ["status"], name: "index_shops_on_status"
+  end
+
+  create_table "slug_blocklist_entries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.boolean "is_active", default: true, null: false
+    t.integer "match_type", default: 0, null: false
+    t.string "term", null: false
+    t.datetime "updated_at", null: false
+    t.index ["is_active"], name: "index_slug_blocklist_entries_on_is_active"
+    t.index ["term"], name: "index_slug_blocklist_entries_on_term", unique: true
   end
 
   create_table "user_addresses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -245,15 +353,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_120000) do
   add_foreign_key "cart_items", "products"
   add_foreign_key "carts", "shops"
   add_foreign_key "carts", "users"
+  add_foreign_key "catalog_lifecycle_events", "users", column: "actor_user_id"
+  add_foreign_key "legal_profile_verification_events", "legal_profiles"
+  add_foreign_key "legal_profile_verification_events", "users", column: "actor_user_id"
+  add_foreign_key "order_events", "orders"
+  add_foreign_key "order_events", "users", column: "actor_user_id"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
   add_foreign_key "orders", "shops"
   add_foreign_key "orders", "users"
   add_foreign_key "product_categories", "shops"
+  add_foreign_key "product_categories", "users", column: "archived_by_id"
+  add_foreign_key "product_categories", "users", column: "published_by_id"
   add_foreign_key "product_properties", "users"
   add_foreign_key "product_property_values", "product_properties"
   add_foreign_key "product_property_values", "products"
   add_foreign_key "products", "product_categories"
   add_foreign_key "products", "shops"
+  add_foreign_key "products", "users", column: "archived_by_id"
+  add_foreign_key "products", "users", column: "published_by_id"
+  add_foreign_key "shop_change_events", "shops"
+  add_foreign_key "shop_change_events", "users", column: "actor_user_id"
+  add_foreign_key "shop_slug_histories", "shops"
   add_foreign_key "user_addresses", "users"
 end

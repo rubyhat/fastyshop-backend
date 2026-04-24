@@ -1,8 +1,19 @@
 # frozen_string_literal: true
 
 class OrderPolicy < ApplicationPolicy
+  def index?
+    user.present?
+  end
+
+  def show?
+    return false unless user
+    return true if user.admin?
+
+    record.user_id == user.id || record.shop.seller_profile.user_id == user.id
+  end
+
   def create_from_cart?
-    user.present? || user.superadmin? || user.supermanager?
+    user.present?
   end
 
   def my_orders?
@@ -15,20 +26,24 @@ class OrderPolicy < ApplicationPolicy
 
   def update_status?
     return false unless user
-    return true if user.superadmin? || user.supermanager?
+    return true if user.admin?
     return true if record.shop.seller_profile.user_id == user.id
-    return true if record.user_id == user.id && record.status_created? # покупатель может отменить
+    return true if record.user_id == user.id
     false
   end
 
-  def cancel?
-    record.user_id == user.id
+  def events?
+    show?
   end
 
   class Scope < Scope
     def resolve
+      return scope.none unless user
+
       if user.admin?
         scope.all
+      elsif user.seller_profile
+        scope.where(shop_id: user.seller_profile.shops.select(:id))
       else
         scope.where(user_id: user.id)
       end

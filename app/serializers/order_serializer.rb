@@ -1,9 +1,19 @@
 # frozen_string_literal: true
 
 class OrderSerializer < ActiveModel::Serializer
-  attributes :id, :status, :delivery_method, :payment_method,
-             :contact_name, :contact_phone, :delivery_address_text,
-             :delivery_comment, :status_comment, :total_price, :created_at
+  attributes :id,
+             :order_number,
+             :shop_id,
+             :status,
+             :total_price,
+             :customer_snapshot,
+             :customer_comment,
+             :shop_snapshot,
+             :legal_profile_snapshot,
+             :last_public_comment,
+             :inventory_restored_at,
+             :created_at,
+             :updated_at
 
   has_many :order_items, serializer: OrderItemSerializer
 end

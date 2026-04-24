@@ -34,11 +34,32 @@ Rails.application.routes.draw do
       # Профиль продавца
       resources :seller_profiles, only: %i[create update show index]
 
+      post "seller_onboarding", to: "seller_onboarding#create"
+
       # Юридические профили
       resources :legal_profiles, only: %i[index show create update] do
         member do
-          patch :unverify
+          post :submit_verification
+          post :approve
+          post :reject
+          get :verification_events
         end
+      end
+
+      namespace :public do
+        resources :legal_profiles, only: [] do
+          member do
+            get :transparency
+          end
+        end
+
+        get "shops/catalog", to: "shops#catalog"
+        get "shops/:shop_slug/categories", to: "product_categories#index"
+        get "shops/:shop_slug/products", to: "products#index"
+        get "shops/:shop_slug/products/:product_slug", to: "products#show"
+        get "shops/:slug", to: "shops#show"
+        get "shops/:slug/legal_details", to: "shops#legal_details"
+        get "shops/:slug/change_history", to: "shops#change_history"
       end
 
       # Магазины
@@ -47,13 +68,38 @@ Rails.application.routes.draw do
           get :catalog
         end
 
+        member do
+          post :disable
+          post :activate
+          post :suspend
+        end
+
         # Категории товаров/услуг магазина
-        resources :product_categories, only: %i[index show create update destroy]
+        resources :product_categories, only: %i[index show create update destroy] do
+          member do
+            post :publish
+            post :archive_preview
+            post :archive
+            post :restore
+          end
+
+          collection do
+            post :reorder
+          end
+        end
 
         # Товары/услуги магазина
         resources :products, only: %i[index show create update destroy] do
+          member do
+            post :publish
+            post :archive
+            post :restore
+          end
+
           resources :product_property_values, only: %i[index show create update destroy]
         end
+
+        resources :customers, only: %i[index show], controller: "shop_customers", param: :user_id
       end
 
       # Категории магазинов
@@ -72,6 +118,10 @@ Rails.application.routes.draw do
 
       # Заказы
       resources :orders, only: %i[index show] do
+        member do
+          get :events
+        end
+
         collection do
           post "from_cart/:shop_id", to: "orders#create_from_cart"
         end

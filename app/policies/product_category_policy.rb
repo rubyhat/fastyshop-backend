@@ -1,16 +1,12 @@
 # frozen_string_literal: true
 
-# Политика доступа к категориям товаров/услуг магазина.
-#
-# Позволяет управлять категориями только владельцу магазина и администраторам.
-#
 class ProductCategoryPolicy < ApplicationPolicy
   def index?
-    true
+    user.present?
   end
 
   def show?
-    true
+    owner_or_admin?
   end
 
   def create?
@@ -22,19 +18,46 @@ class ProductCategoryPolicy < ApplicationPolicy
   end
 
   def destroy?
+    archive?
+  end
+
+  def publish?
+    owner_or_admin?
+  end
+
+  def archive_preview?
+    owner_or_admin?
+  end
+
+  def archive?
+    owner_or_admin?
+  end
+
+  def restore?
+    owner_or_admin?
+  end
+
+  def reorder?
     owner_or_admin?
   end
 
   class Scope < Scope
-    # Показываем только активные категории
     def resolve
-      scope.where(is_active: true)
+      if user&.admin?
+        scope.all
+      elsif user&.seller_profile
+        scope.where(shop_id: user.seller_profile.shops.select(:id))
+      else
+        scope.none
+      end
     end
   end
 
   private
 
   def owner_or_admin?
-    user&.superadmin? || user&.supermanager? || record.shop.seller_profile.user_id == user.id
+    return false unless user && record.respond_to?(:shop) && record.shop
+
+    user.admin? || record.shop.seller_profile.user_id == user.id
   end
 end

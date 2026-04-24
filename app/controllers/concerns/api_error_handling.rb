@@ -33,7 +33,7 @@ module ApiErrorHandling
 
   private
 
-  # Обработка уникальности на уровне базы (например, индекс tax_id)
+  # Обработка уникальности на уровне базы (например, индекс registration_number)
   def render_record_not_unique(exception = nil)
     constraint = extract_constraint_from_exception(exception)
     message = friendly_message_for_constraint(constraint)
@@ -58,12 +58,22 @@ module ApiErrorHandling
   # Возвращаем пользовательское сообщение по имени constraint'а
   def friendly_message_for_constraint(constraint)
     case constraint
-    when "index_legal_profiles_on_tax_id"
-      "Такой налоговый номер уже используется"
+    when "index_legal_profiles_on_country_type_and_registration_number"
+      "Такой регистрационный номер уже используется"
     when "index_users_on_email", "index_users_on_lower_email"
       "Этот email уже зарегистрирован"
     when "index_users_on_phone"
       "Этот номер телефона уже используется"
+    when "index_shops_on_slug", "index_shop_slug_histories_on_slug"
+      "Этот адрес магазина уже используется"
+    when "index_slug_blocklist_entries_on_term"
+      "Этот slug-терм уже есть в словаре запрещённых значений"
+    when "idx_unique_active_carts_on_user_shop"
+      "Для этого магазина уже существует активная корзина"
+    when "index_orders_on_shop_id_and_order_number"
+      "Не удалось безопасно выдать номер заказа"
+    when "idx_orders_on_user_shop_checkout_key"
+      "Этот запрос на оформление заказа уже был обработан"
     else
       nil
     end
@@ -114,7 +124,20 @@ module ApiErrorHandling
       "create?" => "создание",
       "update?" => "редактирование",
       "destroy?" => "удаление",
-      "unverify?" => "отключение верификации"
+      "submit_verification?" => "отправку на верификацию",
+      "approve?" => "подтверждение верификации",
+      "reject?" => "отклонение верификации",
+      "verification_events?" => "просмотр истории верификации",
+      "disable?" => "отключение",
+      "activate?" => "активацию",
+      "suspend?" => "отключение платформой",
+      "publish?" => "публикацию",
+      "archive?" => "архивирование",
+      "archive_preview?" => "предпросмотр архивирования",
+      "restore?" => "восстановление",
+      "reorder?" => "изменение порядка",
+      "events?" => "просмотр истории",
+      "manage_orders?" => "управление заказами"
     }
 
     # Карта моделей → человекочитаемые ресурсы
@@ -124,7 +147,8 @@ module ApiErrorHandling
       "shop" => "магазину",
       "user" => "пользователю",
       "product" => "товару",
-      "order" => "заказу"
+      "order" => "заказу",
+      "cart" => "корзине"
     }
 
     action_text = query_map.fetch(query_name, "действию")

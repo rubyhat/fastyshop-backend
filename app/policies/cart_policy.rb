@@ -2,7 +2,6 @@
 
 # Политика доступа для модели Cart
 class CartPolicy < ApplicationPolicy
-  # Пользователь может видеть только свои корзины
   def index?
     user.present?
   end
@@ -11,24 +10,22 @@ class CartPolicy < ApplicationPolicy
     user.present? && record.user_id == user.id
   end
 
-  # Пользователь может создавать корзину только для себя
   def add_item?
-    user.present?
+    user.present? && record.user_id == user.id
   end
 
-  # Пользователь может удалять товары из своей корзины
   def remove_item?
     user.present? && record.user_id == user.id
   end
 
-  # Не позволяем обновлять корзину напрямую (только через add/remove)
   def update?
     false
   end
 
-  # Scope: только корзины текущего пользователя
   class Scope < Scope
     def resolve
+      return scope.none unless user
+
       scope.where(user_id: user.id)
     end
   end

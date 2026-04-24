@@ -1,31 +1,44 @@
 class LegalProfilePolicy < ApplicationPolicy
   def index?
-    user.superadmin? || user.supermanager? || owns_seller_profile?
+    user.present? && (user.superadmin? || user.supermanager? || user.seller_profile.present?)
   end
 
   def show?
-    true
+    user.present? && (user.superadmin? || user.supermanager? || owns_record_seller_profile?)
   end
 
   def create?
-      user.present? && owns_seller_profile?
+    user.present? && owns_record_seller_profile?
   end
 
   def update?
-    user.superadmin? || user.supermanager? || owns_seller_profile?
+    user.present? && (user.superadmin? || user.supermanager? || owns_record_seller_profile?)
   end
 
-  def unverify?
-    user.present? && owns_seller_profile? && record.is_verified
+  def submit_verification?
+    user.present? && owns_record_seller_profile?
+  end
+
+  def approve?
+    user.present? && (user.superadmin? || user.supermanager?)
+  end
+
+  def reject?
+    user.present? && (user.superadmin? || user.supermanager?)
+  end
+
+  def verification_events?
+    user.present? && (user.superadmin? || user.supermanager? || owns_record_seller_profile?)
   end
 
 
   class Scope < Scope
     def resolve
+      return scope.none unless user.present?
+
       if user.superadmin? || user.supermanager?
         scope.all
       else
-        # scope.joins(:seller_profile).where(seller_profiles: { user_id: user.id })
         profile_ids = user.seller_profile&.legal_profiles&.pluck(:id) || []
         scope.where(id: profile_ids)
       end
@@ -34,7 +47,7 @@ class LegalProfilePolicy < ApplicationPolicy
 
   private
 
-  def owns_seller_profile?
-    user&.seller_profile.present?
+  def owns_record_seller_profile?
+    user&.seller_profile.present? && record.seller_profile_id == user.seller_profile.id
   end
 end

@@ -1,24 +1,13 @@
 # frozen_string_literal: true
 
 class ShopCreateValidator < ActiveModel::Validator
-  MAX_SHOPS = 2 # TODO: заменить на значение из тарифа
-
   def validate(record)
-    validate_shop_limit(record)
     validate_seller_profile(record)
     validate_legal_profile(record)
     validate_legal_profile_ownership(record)
   end
 
   private
-
-  def validate_shop_limit(record)
-    return unless record.seller_profile
-
-    if record.seller_profile.shops.count >= MAX_SHOPS
-      record.errors.add(:base, "Достигнуто максимальное количество магазинов по Вашему тарифу")
-    end
-  end
 
   def validate_seller_profile(record)
     unless record.seller_profile

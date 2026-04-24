@@ -1,6 +1,7 @@
 module RequestHelpers
   def json_body
-    JSON.parse(response.body).with_indifferent_access
+    parsed = JSON.parse(response.body)
+    parsed.respond_to?(:with_indifferent_access) ? parsed.with_indifferent_access : parsed
   rescue JSON::ParserError
     {}
   end

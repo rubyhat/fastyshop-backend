@@ -3,13 +3,8 @@
 module Api
   module V1
     class SellerProfilesController < BaseController
-      skip_before_action :authenticate_user!, only: [ :show, :show_by_user ]
-
       # GET /api/v1/seller_profiles
       def index
-        user = current_user
-        return render_unauthorized unless user
-
         authorize SellerProfile, :index?
         profiles = policy_scope(SellerProfile)
         render json: profiles, status: :ok
@@ -23,25 +18,23 @@ module Api
         profile = user.seller_profile
         return render_not_found unless profile
 
+        authorize profile, :show?
         render json: profile, status: :ok
       end
-
-
 
       # GET /api/v1/seller_profiles/:id
       def show
         profile = SellerProfile.find_by(id: params[:id])
         return render_not_found unless profile
 
+        authorize profile, :show?
         render json: profile, status: :ok
       end
 
       # POST /api/v1/seller_profiles
-      # POST /api/v1/seller_profiles
       def create
         user = current_user
-
-        return render_unauthorized unless user
+        authorize SellerProfile, :create?
 
         if user.seller_profile.present?
           return render_error(
@@ -52,28 +45,22 @@ module Api
           )
         end
 
-        profile = nil
+        profile = SellerProfiles::Create.new(user: user, attributes: seller_profile_params).call
 
-        ActiveRecord::Base.transaction do
-          profile = user.build_seller_profile(seller_profile_params)
-          profile.save!  # бросит исключение, если невалидно
-
-          user.update!(role: :seller)
+        if profile.persisted?
+          render json: profile, status: :created
+        else
+          render_validation_errors(profile)
         end
-
-        render json: profile, status: :created
-
-      rescue ActiveRecord::RecordInvalid => e
-        render_validation_errors(e.record)
       end
 
 
       # PATCH /api/v1/seller_profiles/:id
       def update
-        user = current_user
         profile = SellerProfile.find_by(id: params[:id])
         return render_not_found unless profile
-        return render_forbidden unless user && profile.user_id == user.id
+
+        authorize profile, :update?
 
         if profile.update(seller_profile_params)
           render json: profile, status: :ok

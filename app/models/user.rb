@@ -71,6 +71,11 @@ class User < ApplicationRecord
     superadmin? || supermanager?
   end
 
+  # @return [String]
+  def full_name
+    [ first_name, last_name, middle_name ].compact_blank.join(" ").presence || phone_display || email
+  end
+
   # @return [Boolean]
   def authenticatable?
     !blocked? && !deactivated?

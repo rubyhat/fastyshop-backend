@@ -1,109 +1,163 @@
+# frozen_string_literal: true
+
 module Api
   module V1
     class ShopsController < BaseController
-      skip_before_action :authenticate_user!, only: [ :catalog, :show ]
+      skip_before_action :authenticate_user!, only: [ :catalog ]
 
       # GET /api/v1/shops
-      # Панель продавца: отображает ВСЕ его магазины
       def index
-        # todo: Подумать, нужно ли сделать запрос завязанный на user id, чтобы другие пользователи могли бы смотреть все магазины этого пользователя.
-        # Чтобы админ мог заходить к пользователю и видеть все магазины? Или это вынести в админку?
-        shops = ShopPolicy::Scope.new(current_user, Shop).resolve_owner_view
+        shops = ShopPolicy::Scope.new(current_user, Shop.includes(:seller_profile, :legal_profile, :shop_category)).resolve_owner_view
         authorize Shop
-        render json: shops, status: :ok
+        render json: shops, each_serializer: ShopSerializer, status: :ok
       end
 
-      # GET /api/v1/catalog/shops
-      # Публичный каталог: только активные магазины
+      # GET /api/v1/shops/catalog
+      #
+      # Backward-compatible alias. New platform code should use:
+      # GET /api/v1/public/shops/catalog
       def catalog
-        shops = ShopPolicy::Scope.new(current_user, Shop).resolve_catalog
-        render json: shops, status: :ok
+        shops = ShopPolicy::Scope.new(current_user, Shop.includes(:shop_category, :legal_profile)).resolve_catalog
+        render json: shops, each_serializer: PublicShopCatalogSerializer, status: :ok
       end
 
       # GET /api/v1/shops/:id
       def show
-        shop = Shop.find_by(id: params[:id])
+        shop = find_shop
         return render_not_found unless shop
 
-        render json: shop, status: :ok
+        authorize shop, :show?
+        render json: shop, serializer: ShopSerializer, status: :ok
       end
 
       # POST /api/v1/shops
       def create
-        user = current_user
-        render_unauthorized unless user
-
-        seller_profile = if user&.seller?
-                           user.seller_profile
-        elsif user&.superadmin? || user&.supermanager?
-                           SellerProfile.find_by(id: params[:seller_profile_id])
-        end
-
-        unless seller_profile
-          return render_error(
-            key: "shops.no_seller_profile",
-            message: "Для создания магазина необходим профиль продавца",
-            status: :forbidden,
-            code: 403
-          )
-        end
+        seller_profile = seller_profile_for_create
+        return render_no_seller_profile unless seller_profile
 
         shop = seller_profile.shops.build(shop_params)
-        shop.legal_profile_id = params[:legal_profile_id].to_s.presence
-
         authorize shop, :create?
 
-        if shop.save
-          render json: shop, status: :created
+        result = Shops::Create.new(
+          seller_profile: seller_profile,
+          actor_user: current_user,
+          attributes: shop_params
+        ).call
+
+        if result.success?
+          render json: result.shop, serializer: ShopSerializer, status: :created
         else
-          render_validation_errors(shop)
+          render_validation_errors(result.error_record)
         end
       end
 
       # PATCH /api/v1/shops/:id
       def update
-        shop = Shop.find_by(id: params[:id])
-        render_not_found unless shop
+        shop = find_shop
+        return render_not_found unless shop
 
         authorize shop, :update?
-        shop.legal_profile_id = params[:legal_profile_id].to_s.presence if params[:legal_profile_id].present?
 
-        if shop.update(shop_params)
-          render json: shop, status: :ok
+        result = Shops::Update.new(
+          shop: shop,
+          actor_user: current_user,
+          attributes: shop_params
+        ).call
+
+        if result.success?
+          render json: result.shop, serializer: ShopSerializer, status: :ok
         else
-          render_validation_errors(shop)
+          render_validation_errors(result.error_record)
         end
       end
 
       # DELETE /api/v1/shops/:id
       def destroy
-        shop = Shop.find_by(id: params[:id])
-        render_not_found unless shop
+        disable
+      end
 
-        authorize shop, :destroy?
+      # POST /api/v1/shops/:id/disable
+      def disable
+        shop = find_shop
+        return render_not_found unless shop
 
-        if shop.update(is_active: false)
-          render_success(
-            key: "shops.deleted",
-            message: "Магазин успешно удален",
-            code: 200
-          )
-        else
-          render_validation_errors(shop)
-        end
+        authorize shop, :disable?
+        change_status(shop, :disabled_by_owner)
+      end
+
+      # POST /api/v1/shops/:id/activate
+      def activate
+        shop = find_shop
+        return render_not_found unless shop
+
+        authorize shop, :activate?
+        change_status(shop, :active)
+      end
+
+      # POST /api/v1/shops/:id/suspend
+      def suspend
+        shop = find_shop
+        return render_not_found unless shop
+
+        authorize shop, :suspend?
+        change_status(shop, :suspended_by_admin, comment: status_params[:comment])
       end
 
       private
 
+      def find_shop
+        Shop.includes(:seller_profile, :legal_profile, :shop_category).find_by(id: params[:id])
+      end
+
+      def seller_profile_for_create
+        if current_user&.seller?
+          current_user.seller_profile
+        elsif current_user&.admin?
+          SellerProfile.find_by(id: params[:seller_profile_id])
+        end
+      end
+
+      def render_no_seller_profile
+        render_error(
+          key: "shops.no_seller_profile",
+          message: "Для создания магазина необходим профиль продавца",
+          status: :forbidden,
+          code: 403
+        )
+      end
+
+      def change_status(shop, target_status, comment: nil)
+        result = Shops::ChangeStatus.new(
+          shop: shop,
+          actor_user: current_user,
+          target_status: target_status,
+          comment: comment
+        ).call
+
+        if result.success?
+          render json: result.shop, serializer: ShopSerializer, status: :ok
+        else
+          render_validation_errors(result.error_record)
+        end
+      end
+
       def shop_params
         params.permit(
-        :title,
-        :contact_phone,
-        :contact_email,
-        :shop_category_id,
-        :physical_address,
-        :shop_type
+          :title,
+          :slug,
+          :description,
+          :logo_url,
+          :contact_phone,
+          :contact_email,
+          :shop_category_id,
+          :legal_profile_id,
+          :physical_address,
+          :shop_type
         )
+      end
+
+      def status_params
+        params.permit(:comment)
       end
     end
   end

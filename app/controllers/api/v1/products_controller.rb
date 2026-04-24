@@ -3,54 +3,76 @@
 module Api
   module V1
     class ProductsController < BaseController
-      skip_before_action :authenticate_user!, only: %i[index show]
-
       before_action :set_shop
-      before_action :set_product, only: %i[show update destroy]
+      before_action :set_product, only: %i[show update destroy publish archive restore]
 
+      # GET /api/v1/shops/:shop_id/products
       def index
+        authorize Product.new(shop: @shop), :index?
+
         products = policy_scope(@shop.products.includes(:product_category, product_property_values: :product_property))
-        render json: products, status: 200
+        products = products.where(status: params[:status]) if Product.statuses.key?(params[:status].to_s)
+        products = products.order(:position, :created_at)
+
+        render json: products, each_serializer: ProductSerializer, status: :ok
       end
 
+      # GET /api/v1/shops/:shop_id/products/:id
       def show
         authorize @product, :show?
-        render json: @product, status: 200
+        render json: @product, serializer: ProductSerializer, status: :ok
       end
 
+      # POST /api/v1/shops/:shop_id/products
       def create
         @product = @shop.products.new(product_create_params)
         authorize @product, :create?
 
         if @product.save
-          render json: @product, status: 201
+          render json: @product, serializer: ProductSerializer, status: :created
         else
           render_validation_errors(@product)
         end
       end
 
+      # PATCH /api/v1/shops/:shop_id/products/:id
       def update
         authorize @product, :update?
 
         if @product.update(product_update_params)
-          render json: @product, status: 200
+          render json: @product, serializer: ProductSerializer, status: :ok
         else
           render_validation_errors(@product)
         end
       end
 
+      # DELETE /api/v1/shops/:shop_id/products/:id
       def destroy
-        authorize @product, :destroy?
+        archive
+      end
 
-        if @product.destroy
-          render_success(
-            key: "product.deleted",
-            message: "Успешно удалено",
-            code: 200
-          )
-        else
-          render_validation_errors(@product)
-        end
+      # POST /api/v1/shops/:shop_id/products/:id/publish
+      def publish
+        authorize @product, :publish?
+
+        result = Products::Publish.new(product: @product, actor_user: current_user).call
+        render_lifecycle_result(result)
+      end
+
+      # POST /api/v1/shops/:shop_id/products/:id/archive
+      def archive
+        authorize @product, :archive?
+
+        result = Products::Archive.new(product: @product, actor_user: current_user).call
+        render_lifecycle_result(result)
+      end
+
+      # POST /api/v1/shops/:shop_id/products/:id/restore
+      def restore
+        authorize @product, :restore?
+
+        result = Products::Restore.new(product: @product, actor_user: current_user).call
+        render_lifecycle_result(result)
       end
 
       private
@@ -60,7 +82,15 @@ module Api
       end
 
       def set_product
-        @product = Product.find(params[:id])
+        @product = @shop.products.find(params[:id])
+      end
+
+      def render_lifecycle_result(result)
+        if result.success?
+          render json: result.product, serializer: ProductSerializer, status: :ok
+        else
+          render_validation_errors(result.error_record)
+        end
       end
 
       def product_create_params
@@ -70,7 +100,9 @@ module Api
           :price,
           :product_type,
           :product_category_id,
-          :stock_quantity
+          :stock_quantity,
+          :sku,
+          :image_url
         )
       end
 
@@ -81,9 +113,10 @@ module Api
           :price,
           :product_type,
           :product_category_id,
-          :is_active,
           :position,
-          :stock_quantity
+          :stock_quantity,
+          :sku,
+          :image_url
         )
       end
     end

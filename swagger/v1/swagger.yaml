@@ -81,3 +81,1149 @@ paths:
               required:
               - phone
               - password
+  "/api/v1/shops/{shop_id}/product_categories":
+    get:
+      summary: Список категорий магазина для кабинета
+      tags:
+      - Product categories
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: shop_id
+        in: path
+        schema:
+          type: string
+        required: true
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - draft
+          - published
+          - archived
+      responses:
+        '200':
+          description: Категории магазина
+    post:
+      summary: Создание категории магазина в статусе draft
+      tags:
+      - Product categories
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: shop_id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '201':
+          description: Категория создана
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_category:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      example: Цветы
+                    parent_id:
+                      type: string
+                      nullable: true
+                      example:
+                    position:
+                      type: integer
+                      example: 1
+                  required:
+                  - title
+              required:
+              - product_category
+  "/api/v1/shops/{shop_id}/product_categories/{id}/publish":
+    post:
+      summary: Публикация категории
+      tags:
+      - Product categories
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: shop_id
+        in: path
+        schema:
+          type: string
+        required: true
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Категория опубликована
+  "/api/v1/shops/{shop_id}/product_categories/{id}/archive_preview":
+    post:
+      summary: Предпросмотр архивирования категории
+      tags:
+      - Product categories
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: shop_id
+        in: path
+        schema:
+          type: string
+        required: true
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Количество затронутых сущностей
+  "/api/v1/shops/{shop_id}/product_categories/{id}/archive":
+    post:
+      summary: Архивирование категории с каскадом по потомкам
+      tags:
+      - Product categories
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: shop_id
+        in: path
+        schema:
+          type: string
+        required: true
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Категория архивирована
+  "/api/v1/shops/{shop_id}/product_categories/{id}/restore":
+    post:
+      summary: Восстановление категории в draft
+      tags:
+      - Product categories
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: shop_id
+        in: path
+        schema:
+          type: string
+        required: true
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Категория восстановлена в draft
+  "/api/v1/shops/{shop_id}/products":
+    get:
+      summary: Список товаров магазина для кабинета
+      tags:
+      - Products
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: shop_id
+        in: path
+        schema:
+          type: string
+        required: true
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - draft
+          - published
+          - archived
+      responses:
+        '200':
+          description: Товары магазина
+    post:
+      summary: Создание товара магазина в статусе draft
+      tags:
+      - Products
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: shop_id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '201':
+          description: Товар создан
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      example: Букет тюльпанов
+                    description:
+                      type: string
+                      example: Весенний букет
+                    price:
+                      type: string
+                      example: '15000.00'
+                    product_type:
+                      type: string
+                      enum:
+                      - physical
+                      - digital
+                      - service
+                      example: physical
+                    product_category_id:
+                      type: string
+                      nullable: true
+                      example:
+                    stock_quantity:
+                      type: integer
+                      example: 5
+                    sku:
+                      type: string
+                      nullable: true
+                      example: FLOWER-001
+                    image_url:
+                      type: string
+                      nullable: true
+                      example:
+                  required:
+                  - title
+                  - price
+                  - product_type
+              required:
+              - product
+  "/api/v1/shops/{shop_id}/products/{id}/publish":
+    post:
+      summary: Публикация товара
+      tags:
+      - Products
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: shop_id
+        in: path
+        schema:
+          type: string
+        required: true
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Товар опубликован
+  "/api/v1/shops/{shop_id}/products/{id}/archive":
+    post:
+      summary: Архивирование товара
+      tags:
+      - Products
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: shop_id
+        in: path
+        schema:
+          type: string
+        required: true
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Товар архивирован
+  "/api/v1/shops/{shop_id}/products/{id}/restore":
+    post:
+      summary: Восстановление товара в draft
+      tags:
+      - Products
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: shop_id
+        in: path
+        schema:
+          type: string
+        required: true
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Товар восстановлен в draft
+  "/api/v1/public/shops/{shop_slug}/categories":
+    get:
+      summary: Публичные опубликованные категории магазина
+      tags:
+      - Public catalog
+      security: []
+      parameters:
+      - name: shop_slug
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Опубликованные категории
+  "/api/v1/public/shops/{shop_slug}/products":
+    get:
+      summary: Публичные опубликованные товары магазина
+      tags:
+      - Public catalog
+      security: []
+      parameters:
+      - name: shop_slug
+        in: path
+        schema:
+          type: string
+        required: true
+      - name: category_slug
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Опубликованные товары
+  "/api/v1/public/shops/{shop_slug}/products/{product_slug}":
+    get:
+      summary: Публичная карточка опубликованного товара
+      tags:
+      - Public catalog
+      security: []
+      parameters:
+      - name: shop_slug
+        in: path
+        schema:
+          type: string
+        required: true
+      - name: product_slug
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Опубликованный товар
+  "/api/v1/carts/{shop_id}":
+    get:
+      summary: Корзина пользователя по магазину
+      tags:
+      - Cart
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: shop_id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Корзина с price_changed и unavailable items
+  "/api/v1/orders/from_cart/{shop_id}":
+    post:
+      summary: Оформление заказа из корзины
+      tags:
+      - Orders
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: Idempotency-Key
+        in: header
+        schema:
+          type: string
+      - name: shop_id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '201':
+          description: Заказ создан из валидных товаров, skipped items остаются в
+            корзине
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order:
+                  type: object
+                  properties:
+                    contact_name:
+                      type: string
+                      nullable: true
+                      example: Алия Омарова
+                    contact_phone:
+                      type: string
+                      nullable: true
+                      example: "+77001234567"
+                    customer_comment:
+                      type: string
+                      nullable: true
+                      example: Позвоните перед подтверждением
+  "/api/v1/my/orders":
+    get:
+      summary: Список заказов покупателя
+      tags:
+      - Orders
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - created
+          - accepted
+          - in_progress
+          - ready
+          - completed
+          - rejected_by_seller
+          - canceled_by_user
+          - canceled_by_seller
+      responses:
+        '200':
+          description: Список собственных заказов buyer
+  "/api/v1/shops/{shop_id}/orders":
+    get:
+      summary: Список заказов магазина для продавца
+      tags:
+      - Orders
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: shop_id
+        in: path
+        schema:
+          type: string
+        required: true
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - created
+          - accepted
+          - in_progress
+          - ready
+          - completed
+          - rejected_by_seller
+          - canceled_by_user
+          - canceled_by_seller
+      responses:
+        '200':
+          description: Список заказов только по выбранному магазину
+  "/api/v1/orders/{id}/status":
+    patch:
+      summary: Смена статуса заказа
+      tags:
+      - Orders
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Заказ переведён в rejected_by_seller и stock восстановлен
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      enum:
+                      - accepted
+                      - rejected_by_seller
+                      - canceled_by_user
+                      - canceled_by_seller
+                      - in_progress
+                      - ready
+                      - completed
+                    comment:
+                      type: string
+                      nullable: true
+                      example: Товар закончился
+                  required:
+                  - status
+              required:
+              - order
+  "/api/v1/orders/{id}/events":
+    get:
+      summary: История событий заказа
+      tags:
+      - Orders
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Timeline заказа
+  "/api/v1/shops/{shop_id}/customers":
+    get:
+      summary: Список покупателей магазина
+      tags:
+      - Shop customers
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: shop_id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Read-only customer base продавца
+  "/api/v1/shops/{shop_id}/customers/{user_id}":
+    get:
+      summary: Детальная карточка покупателя магазина
+      tags:
+      - Shop customers
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: shop_id
+        in: path
+        schema:
+          type: string
+        required: true
+      - name: user_id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Покупатель и его заказы только в рамках магазина
+  "/api/v1/seller_profiles":
+    post:
+      summary: Создание профиля продавца
+      tags:
+      - Seller profiles
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Профиль продавца создан
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                display_name:
+                  type: string
+                  example: Miras Store Group
+                description:
+                  type: string
+                  example: Описание продавца
+                logo_url:
+                  type: string
+                  example: https://cdn.example.com/logo.png
+              required:
+              - display_name
+  "/api/v1/legal_profiles":
+    post:
+      summary: Создание юридического профиля
+      tags:
+      - Legal profiles
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Юридический профиль создан
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                country_code:
+                  type: string
+                  example: KZ
+                legal_form_code:
+                  type: string
+                  example: limited_liability_partnership
+                legal_name:
+                  type: string
+                  example: TOO Miras Trade
+                registration_number_type:
+                  type: string
+                  example: bin
+                registration_number:
+                  type: string
+                  example: '123456789012'
+                legal_address:
+                  type: string
+                  example: Алматы, Абая 1
+              required:
+              - country_code
+              - legal_form_code
+              - legal_name
+              - registration_number_type
+              - registration_number
+  "/api/v1/legal_profiles/{id}/submit_verification":
+    post:
+      summary: Подача юридического профиля на ручную проверку
+      tags:
+      - Legal profiles
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Юридический профиль отправлен на проверку
+  "/api/v1/legal_profiles/{id}/approve":
+    post:
+      summary: Подтверждение верификации юридического профиля
+      tags:
+      - Legal profiles
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Юридический профиль одобрен
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+                  example: Документы проверены
+  "/api/v1/legal_profiles/{id}/reject":
+    post:
+      summary: Отклонение юридического профиля
+      tags:
+      - Legal profiles
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Юридический профиль отклонён
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+                  example: Нужно уточнить регистрационные данные
+  "/api/v1/legal_profiles/{id}/verification_events":
+    get:
+      summary: История верификации юридического профиля
+      tags:
+      - Legal profiles
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: История событий верификации
+  "/api/v1/seller_onboarding":
+    post:
+      summary: Первичный онбординг продавца
+      tags:
+      - Seller onboarding
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Онбординг продавца выполнен
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                seller_profile:
+                  type: object
+                  properties:
+                    display_name:
+                      type: string
+                      example: Miras Store Group
+                    description:
+                      type: string
+                      example: Описание продавца
+                    logo_url:
+                      type: string
+                      example: https://cdn.example.com/logo.png
+                  required:
+                  - display_name
+                legal_profile:
+                  type: object
+                  properties:
+                    country_code:
+                      type: string
+                      example: KZ
+                    legal_form_code:
+                      type: string
+                      example: limited_liability_partnership
+                    legal_name:
+                      type: string
+                      example: TOO Miras Trade
+                    registration_number_type:
+                      type: string
+                      example: bin
+                    registration_number:
+                      type: string
+                      example: '123456789012'
+                    legal_address:
+                      type: string
+                      example: Алматы, Абая 1
+                  required:
+                  - country_code
+                  - legal_form_code
+                  - legal_name
+                  - registration_number_type
+                  - registration_number
+                shop:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      example: Miras Flowers
+                    slug:
+                      type: string
+                      example: miras-flowers
+                    description:
+                      type: string
+                      example: Магазин цветов с доставкой
+                    logo_url:
+                      type: string
+                      example: https://cdn.example.com/shops/miras-flowers.png
+                    contact_phone:
+                      type: string
+                      example: "+77001234567"
+                    contact_email:
+                      type: string
+                      example: shop@example.com
+                    physical_address:
+                      type: string
+                      example: Алматы, Байзакова 10
+                    shop_type:
+                      type: string
+                      example: online
+                    shop_category_id:
+                      type: integer
+                      example: 1
+                  required:
+                  - title
+                  - slug
+                  - contact_phone
+                  - shop_type
+                  - shop_category_id
+              required:
+              - seller_profile
+              - legal_profile
+              - shop
+  "/api/v1/public/legal_profiles/{id}/transparency":
+    get:
+      summary: Публичная прозрачность продавца и юридического профиля
+      tags:
+      - Public legal profiles
+      security: []
+      parameters:
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Публичные безопасные данные по продавцу
+  "/api/v1/shops":
+    post:
+      summary: Создание магазина
+      tags:
+      - Shops
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Магазин создан
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Miras Flowers
+                slug:
+                  type: string
+                  example: miras-flowers
+                description:
+                  type: string
+                  example: Цветы с доставкой по Алматы
+                logo_url:
+                  type: string
+                  example: https://cdn.example.com/shops/miras/logo.png
+                contact_phone:
+                  type: string
+                  example: "+77001234567"
+                contact_email:
+                  type: string
+                  example: shop@example.com
+                physical_address:
+                  type: string
+                  example: Алматы, Байзакова 10
+                shop_type:
+                  type: string
+                  example: hybrid
+                shop_category_id:
+                  type: string
+                  example: uuid
+                legal_profile_id:
+                  type: string
+                  example: uuid
+              required:
+              - title
+              - slug
+              - contact_phone
+              - shop_type
+              - shop_category_id
+              - legal_profile_id
+  "/api/v1/shops/{id}":
+    patch:
+      summary: Обновление магазина
+      tags:
+      - Shops
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Магазин обновлён
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Miras Flowers Premium
+                slug:
+                  type: string
+                  example: miras-flowers-premium
+                legal_profile_id:
+                  type: string
+                  example: uuid
+  "/api/v1/shops/{id}/disable":
+    post:
+      summary: Отключение магазина владельцем
+      tags:
+      - Shops
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Магазин отключён владельцем
+  "/api/v1/shops/{id}/activate":
+    post:
+      summary: Активация магазина
+      tags:
+      - Shops
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Магазин активирован
+  "/api/v1/shops/{id}/suspend":
+    post:
+      summary: Отключение магазина платформой
+      tags:
+      - Shops
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: id
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Магазин отключён платформой
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+                  example: Нарушение правил платформы
+              required:
+              - comment
+  "/api/v1/public/shops/catalog":
+    get:
+      summary: Публичный каталог магазинов
+      tags:
+      - Public shops
+      security: []
+      responses:
+        '200':
+          description: Список активных магазинов
+  "/api/v1/public/shops/{slug}":
+    get:
+      summary: Публичная страница магазина
+      tags:
+      - Public shops
+      security: []
+      parameters:
+      - name: slug
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Публичные данные магазина
+  "/api/v1/public/shops/{slug}/legal_details":
+    get:
+      summary: Публичные юридические данные магазина
+      tags:
+      - Public shops
+      security: []
+      parameters:
+      - name: slug
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Юридическая прозрачность магазина
+  "/api/v1/public/shops/{slug}/change_history":
+    get:
+      summary: Публичная история trust-критичных изменений магазина
+      tags:
+      - Public shops
+      security: []
+      parameters:
+      - name: slug
+        in: path
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: История изменений магазина

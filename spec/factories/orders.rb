@@ -4,12 +4,23 @@ FactoryBot.define do
     association :shop
 
     status { :created }
-    delivery_method { :courier }
-    payment_method { :cash_on_delivery }
-
-    contact_name { "Тестовый пользователь" }
-    contact_phone { "77075554433" }
-    delivery_address_text { "Алматы, ул. Толе би, д. 15" }
+    sequence(:order_number) { |n| n }
     total_price { 1500 }
+    customer_comment { nil }
+    inventory_restored_at { nil }
+    checkout_idempotency_key { nil }
+
+    after(:build) do |order|
+      next unless order.shop
+
+      snapshots = OrderSnapshots::Build.new(shop: order.shop).call
+      order.shop_snapshot = snapshots[:shop_snapshot]
+      order.legal_profile_snapshot = snapshots[:legal_profile_snapshot]
+      order.customer_snapshot = {
+        "full_name" => order.user.full_name,
+        "phone" => order.user.phone_display,
+        "email" => order.user.email
+      } if order.customer_snapshot.blank?
+    end
   end
 end

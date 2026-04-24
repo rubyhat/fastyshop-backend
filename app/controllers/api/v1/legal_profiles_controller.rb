@@ -1,17 +1,12 @@
 # frozen_string_literal: true
 
-# todo: добавить удаление, когда будут магазины
 module Api
   module V1
     class LegalProfilesController < BaseController
       before_action :set_seller_profile, only: [ :create ]
-      skip_before_action :authenticate_user!, only: [ :show ]
 
       # GET /api/v1/legal_profiles
       def index
-        user = current_user
-        return render_unauthorized unless user
-
         authorize LegalProfile, :index?
         legal_profiles = policy_scope(LegalProfile)
         render json: legal_profiles, status: :ok
@@ -22,14 +17,12 @@ module Api
         profile = LegalProfile.find_by(id: params[:id])
         return render_not_found unless profile
 
+        authorize profile, :show?
         render json: profile, status: :ok
       end
 
       # POST /api/v1/legal_profiles
       def create
-        user = current_user
-        return render_unauthorized unless user
-
         unless @seller_profile
           return render_error(
             key: "legal_profiles.no_seller_profile",
@@ -43,61 +36,93 @@ module Api
 
         authorize legal_profile, :create?
 
-        ActiveRecord::Base.transaction do
-          legal_profile.save! # если невалидно или дубликат — выбросит ошибку
+        if legal_profile.save
           render json: legal_profile, status: :created
+        else
+          render_validation_errors(legal_profile)
         end
-
-      rescue ActiveRecord::RecordInvalid => e
-        render_validation_errors(e.record)
-
-      rescue ActiveRecord::RecordNotUnique => e
-        render_record_not_unique(e)
       end
 
       # PATCH /api/v1/legal_profiles/:id
       def update
-        user = current_user
-        return render_unauthorized unless user
-
         profile = LegalProfile.find_by(id: params[:id])
         return render_not_found unless profile
 
         authorize profile, :update?
 
-        permitted_fields = permitted_update_fields(profile)
-        if profile.update(params.permit(permitted_fields))
+        profile = LegalProfiles::Update.new(
+          legal_profile: profile,
+          attributes: params.permit(*permitted_update_fields(profile)),
+          actor: current_user
+        ).call
+
+        if profile.errors.empty?
           render json: profile, status: :ok
         else
           render_validation_errors(profile)
         end
       end
 
-      # PATCH /api/v1/legal_profiles/:id/unverify
-      def unverify
-        user = current_user
-        return render_unauthorized unless user
-
+      # POST /api/v1/legal_profiles/:id/submit_verification
+      def submit_verification
         profile = LegalProfile.find_by(id: params[:id])
         return render_not_found unless profile
 
-        authorize profile, :unverify?
+        authorize profile, :submit_verification?
 
-        if profile.is_verified
-          profile.update(is_verified: false)
+        profile = LegalProfiles::SubmitVerification.new(
+          legal_profile: profile,
+          actor: current_user
+        ).call
+
+        if profile.errors.empty?
           render json: profile, status: :ok
         else
-          render_error(
-            key: "legal_profiles.not_verified",
-            message: "Профиль уже не верифицирован",
-            status: :bad_request,
-            code: 400
-          )
+          render_validation_errors(profile)
         end
       end
 
+      # POST /api/v1/legal_profiles/:id/approve
+      def approve
+        moderate!(:approved)
+      end
+
+      # POST /api/v1/legal_profiles/:id/reject
+      def reject
+        moderate!(:rejected)
+      end
+
+      # GET /api/v1/legal_profiles/:id/verification_events
+      def verification_events
+        profile = LegalProfile.find_by(id: params[:id])
+        return render_not_found unless profile
+
+        authorize profile, :verification_events?
+
+        render json: profile.verification_events.order(:created_at), status: :ok
+      end
 
       private
+
+      def moderate!(target_status)
+        profile = LegalProfile.find_by(id: params[:id])
+        return render_not_found unless profile
+
+        authorize profile, target_status == :approved ? :approve? : :reject?
+
+        profile = LegalProfiles::Moderate.new(
+          legal_profile: profile,
+          actor: current_user,
+          target_status: target_status,
+          comment: moderation_params[:comment]
+        ).call
+
+        if profile.errors.empty?
+          render json: profile, status: :ok
+        else
+          render_validation_errors(profile)
+        end
+      end
 
       def set_seller_profile
         user = current_user
@@ -106,11 +131,12 @@ module Api
 
       def legal_profile_params
         params.permit(
-          :company_name,
-          :tax_id,
           :country_code,
+          :legal_form_code,
+          :legal_name,
+          :registration_number_type,
+          :registration_number,
           :legal_address,
-          :legal_form
         )
       end
 
@@ -118,13 +144,22 @@ module Api
         user = current_user
         return [] unless user
 
-        if user.superadmin? || user.supermanager?
-          %i[company_name tax_id country_code legal_address legal_form is_verified]
-        elsif profile.is_verified
-          %i[legal_address] # только адрес можно редактировать
+        if user.superadmin? || user.supermanager? || profile.seller_profile_id == user.seller_profile&.id
+          %i[
+            country_code
+            legal_form_code
+            legal_name
+            registration_number_type
+            registration_number
+            legal_address
+          ]
         else
-          %i[company_name tax_id country_code legal_address legal_form]
+          []
         end
+      end
+
+      def moderation_params
+        params.permit(:comment)
       end
     end
   end

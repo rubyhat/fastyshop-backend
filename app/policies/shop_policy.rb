@@ -1,50 +1,70 @@
+# frozen_string_literal: true
+
 class ShopPolicy < ApplicationPolicy
-    def index?
-      true
+  def index?
+    user.present?
+  end
+
+  def show?
+    admin? || owns_shop?
+  end
+
+  def create?
+    user.present? && (user.seller? || admin?)
+  end
+
+  def update?
+    admin? || owns_shop?
+  end
+
+  def destroy?
+    update?
+  end
+
+  def disable?
+    update?
+  end
+
+  def activate?
+    return false unless update?
+    return admin? if record.suspended_by_admin?
+
+    true
+  end
+
+  def suspend?
+    admin?
+  end
+
+  def manage_orders?
+    admin? || owns_shop?
+  end
+
+  class Scope < Scope
+    def resolve_catalog
+      scope.active
     end
 
-    def show?
-      true
-    end
-
-    def create?
-      (user.present? && user.seller?) || user.superadmin? || user.supermanager?
-    end
-
-    def update?
-      user.superadmin? || user.supermanager? || owns_shop?
-    end
-
-    def destroy?
-      user.superadmin? || user.supermanager? || owns_shop?
-    end
-
-    def manage_orders?
-      user.present? && record.seller_profile.user_id == user.id
-    end
-
-
-    class Scope < Scope
-      def resolve_catalog
-        scope.where(is_active: true)
+    def resolve_owner_view
+      if user&.admin?
+        scope.all
+      elsif user&.seller_profile
+        scope.where(seller_profile_id: user.seller_profile.id)
+      else
+        scope.none
       end
-
-      def resolve_owner_view
-        if user&.superadmin? || user&.supermanager?
-          scope.all
-        elsif user&.seller_profile
-          scope.where(seller_profile_id: user.seller_profile.id)
-        else
-          # Покупатель — видит только активные магазины конкретного продавца
-          scope.where(seller_profile_id: user&.seller_profile&.id, is_active: true)
-        end
-      end
     end
+  end
 
-    private
+  private
 
-    def owns_shop?
-      record.respond_to?(:seller_profile) &&
-        record.seller_profile.user_id == user.id
-    end
+  def admin?
+    user&.admin?
+  end
+
+  def owns_shop?
+    return false unless user && record.respond_to?(:seller_profile)
+
+    record.seller_profile&.user_id == user.id
+  end
 end

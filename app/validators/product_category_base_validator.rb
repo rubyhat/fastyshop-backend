@@ -1,31 +1,12 @@
 # frozen_string_literal: true
 
-# Общий валидатор для ProductCategory.
-#
-# Используется как include внутри других валидаторов.
-# Проверяет:
-# - уровень вложенности (максимум 3)
-# - уникальность slug в рамках магазина
-# - существование родительской категории (если передан parent_id)
-#
-class ProductCategoryBaseValidator  < ActiveModel::Validator
-  MAX_LEVEL = 3
-
+class ProductCategoryBaseValidator < ActiveModel::Validator
   def validate(record)
-    validate_level(record)
     validate_slug_uniqueness(record)
     validate_parent_exists(record)
   end
 
   private
-
-  def validate_level(record)
-    return if record.level.nil?
-
-    if record.level > MAX_LEVEL
-      record.errors.add(:level, "не может быть больше #{MAX_LEVEL}")
-    end
-  end
 
   def validate_slug_uniqueness(record)
     return if record.slug.blank? || record.shop.blank?
@@ -33,9 +14,7 @@ class ProductCategoryBaseValidator  < ActiveModel::Validator
     scope = record.shop.product_categories.where(slug: record.slug)
     scope = scope.where.not(id: record.id) if record.persisted?
 
-    if scope.exists?
-      record.errors.add(:slug, "должен быть уникальным в пределах магазина")
-    end
+    record.errors.add(:slug, "должен быть уникальным в пределах магазина") if scope.exists?
   end
 
   def validate_parent_exists(record)

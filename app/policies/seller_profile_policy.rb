@@ -1,27 +1,29 @@
 
 class SellerProfilePolicy < ApplicationPolicy
   def index?
-    user.superadmin? || user.supermanager?
+    user.present?
   end
 
   def show?
-    true
+    user.present? && (user.superadmin? || user.supermanager? || user.id == record.user_id)
   end
 
   def create?
-    user.present? && user.seller_profile.blank?
+    user.present?
   end
 
   def update?
-    user.superadmin? || user.supermanager? || user.id == record.user_id
+    user.present? && (user.superadmin? || user.supermanager? || user.id == record.user_id)
   end
 
   class Scope < ApplicationPolicy::Scope
     def resolve
+      return scope.none unless user.present?
+
       if user.superadmin? || user.supermanager?
         scope.all
       else
-        scope.none
+        scope.where(user_id: user.id)
       end
     end
   end
